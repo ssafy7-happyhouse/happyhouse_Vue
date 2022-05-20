@@ -7,14 +7,14 @@
     <a
       href="#"
       aria-current="page"
-      class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block active router-link-active"
+      class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block active router-link-active "
     >
       {{ $route.name }}
     </a>
     <!-- Navbar links -->
     <b-navbar-nav class="align-items-center ml-md-auto">
       <!-- This item dont have <b-nav-item> because item have data-action/data-target on tag <a>, wich we cant add -->
-      <li class="nav-item d-sm-none">
+      <!-- <li class="nav-item d-sm-none">
         <a
           class="nav-link"
           href="#"
@@ -23,9 +23,9 @@
         >
           <i class="ni ni-zoom-split-in"></i>
         </a>
-      </li>
+      </li> -->
     </b-navbar-nav>
-    <b-navbar-nav class="align-items-center ml-auto ml-md-0">
+    <b-navbar-nav class="align-items-center ml-mr-auto ml-md-0">
       <b-form
         class="navbar-search form-inline mr-sm-3"
         :class="{
@@ -36,16 +36,44 @@
       >
         <b-form-group class="mb-0">
           <b-input-group class="input-group-alternative input-group-merge">
-            <b-form-input placeholder="Search" type="text"> </b-form-input>
+            <b-form-input
+              placeholder="Search"
+              type="text"
+              v-model="searchQuery"
+              @keyup.enter="search"
+              autocomplete="off"
+            >
+            </b-form-input>
 
             <div class="input-group-append">
               <span class="input-group-text"
                 ><i class="fas fa-search"></i
               ></span>
             </div>
+            <ul class="dropdown-menu" id="myDropdown" style="z-index: 3;">
+              <template>
+                <b-dropdown-header class="noti-title">
+                  <h6 class="text-overflow m-0">주소</h6>
+                </b-dropdown-header>
+
+                <b-dropdown-item
+                  v-for="(address, index) in addresses"
+                  :key="index"
+                  @click="moveAddress"
+                >
+                  <span>{{ address.gugunName }} {{ address.dongName }}</span>
+                </b-dropdown-item>
+
+                <div class="dropdown-divider"></div>
+                <b-dropdown-header class="noti-title">
+                  <h6 class="text-overflow m-0">아파트</h6>
+                </b-dropdown-header>
+              </template>
+            </ul>
           </b-input-group>
         </b-form-group>
       </b-form>
+
       <base-dropdown
         menu-on-right
         class="nav-item"
@@ -92,11 +120,13 @@
         </template>
       </base-dropdown>
     </b-navbar-nav>
+    <b-navbar-nav class="align-items-center ml-md-auto"> </b-navbar-nav>
   </base-nav>
 </template>
 <script>
 import { CollapseTransition } from "vue2-transitions";
 import { BaseNav, Modal } from "@/components";
+import { dongList } from "@/api/address";
 
 export default {
   components: {
@@ -123,10 +153,28 @@ export default {
       activeNotifications: false,
       showMenu: false,
       searchModalVisible: false,
-      searchQuery: ""
+      searchQuery: "",
+      addresses: []
     };
   },
   methods: {
+    search() {
+      document.getElementById("myDropdown").classList.toggle("show");
+      dongList(
+        this.searchQuery,
+        response => {
+          this.addresses = response.data;
+          console.log(this.addresses);
+        },
+        error => {}
+      );
+    },
+    moveAddress(event) {
+      console.log(
+        event.currentTarget.getElementsByTagName("span")[0].innerHTML
+      );
+      document.getElementById("myDropdown").classList.toggle("show");
+    },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     },

@@ -10,7 +10,7 @@
             <div
               id="map-custom"
               class="map-canvas"
-              style="height: 1000px;"
+              style="height: 1000px; z-index: 0;"
             ></div>
           </b-card>
         </b-col>
