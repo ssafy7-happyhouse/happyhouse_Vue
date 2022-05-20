@@ -33,6 +33,7 @@
           'navbar-search-light': type === 'light'
         }"
         id="navbar-search-main"
+        @submit.prevent="search"
       >
         <b-form-group class="mb-0">
           <b-input-group class="input-group-alternative input-group-merge">
@@ -40,7 +41,6 @@
               placeholder="Search"
               type="text"
               v-model="searchQuery"
-              @keyup.enter="search"
               autocomplete="off"
             >
             </b-form-input>
@@ -65,60 +65,20 @@
                 </b-dropdown-item>
 
                 <div class="dropdown-divider"></div>
-                <b-dropdown-header class="noti-title">
-                  <h6 class="text-overflow m-0">아파트</h6>
-                </b-dropdown-header>
+                <!-- <b-dropdown-item
+                  v-for="(apartment, index) in apartments"
+                  :key="index"
+                  @click="moveAddress"
+                >
+                  <span name="${apartment.aptCode}">{{
+                    apartment.aptName
+                  }}</span>
+                </b-dropdown-item> -->
               </template>
             </ul>
           </b-input-group>
         </b-form-group>
       </b-form>
-
-      <base-dropdown
-        menu-on-right
-        class="nav-item"
-        tag="li"
-        title-tag="a"
-        title-classes="nav-link pr-0"
-      >
-        <a href="#" class="nav-link pr-0" @click.prevent slot="title-container">
-          <b-media no-body class="align-items-center">
-            <span class="avatar avatar-sm rounded-circle">
-              <img alt="Image placeholder" src="img/theme/team-4.jpg" />
-            </span>
-            <b-media-body class="ml-2 d-none d-lg-block">
-              <span class="mb-0 text-sm  font-weight-bold">John Snow</span>
-            </b-media-body>
-          </b-media>
-        </a>
-
-        <template>
-          <b-dropdown-header class="noti-title">
-            <h6 class="text-overflow m-0">Welcome!</h6>
-          </b-dropdown-header>
-          <b-dropdown-item href="#!">
-            <i class="ni ni-single-02"></i>
-            <span>My profile</span>
-          </b-dropdown-item>
-          <b-dropdown-item href="#!">
-            <i class="ni ni-settings-gear-65"></i>
-            <span>Settings</span>
-          </b-dropdown-item>
-          <b-dropdown-item href="#!">
-            <i class="ni ni-calendar-grid-58"></i>
-            <span>Activity</span>
-          </b-dropdown-item>
-          <b-dropdown-item href="#!">
-            <i class="ni ni-support-16"></i>
-            <span>Support</span>
-          </b-dropdown-item>
-          <div class="dropdown-divider"></div>
-          <b-dropdown-item href="#!">
-            <i class="ni ni-user-run"></i>
-            <span>Logout</span>
-          </b-dropdown-item>
-        </template>
-      </base-dropdown>
     </b-navbar-nav>
     <b-navbar-nav class="align-items-center ml-md-auto"> </b-navbar-nav>
   </base-nav>
@@ -127,6 +87,8 @@
 import { CollapseTransition } from "vue2-transitions";
 import { BaseNav, Modal } from "@/components";
 import { dongList } from "@/api/address";
+import { aptListByName } from "@/api/apartment";
+import { mapState } from "vuex";
 
 export default {
   components: {
@@ -143,6 +105,8 @@ export default {
     }
   },
   computed: {
+    ...mapState("mapStore", ["map"]),
+
     routeName() {
       const { name } = this.$route;
       return this.capitalizeFirstLetter(name);
@@ -154,7 +118,8 @@ export default {
       showMenu: false,
       searchModalVisible: false,
       searchQuery: "",
-      addresses: []
+      addresses: [],
+      apartments: []
     };
   },
   methods: {
@@ -164,16 +129,31 @@ export default {
         this.searchQuery,
         response => {
           this.addresses = response.data;
-          console.log(this.addresses);
+        },
+        error => {}
+      );
+      aptListByName(
+        this.searchQuery,
+        response => {
+          this.apartments = response.data;
         },
         error => {}
       );
     },
     moveAddress(event) {
-      console.log(
-        event.currentTarget.getElementsByTagName("span")[0].innerHTML
+      const geocoder = new kakao.maps.services.Geocoder();
+      // 주소로 좌표를 검색합니다
+      const map = this.map;
+      geocoder.addressSearch(
+        event.currentTarget.getElementsByTagName("span")[0].innerHTML,
+        function(result, status) {
+          // 정상적으로 검색이 완료됐으면
+          if (status === kakao.maps.services.Status.OK) {
+            map.setCenter(new kakao.maps.LatLng(result[0].y, result[0].x));
+            document.getElementById("myDropdown").classList.toggle("show");
+          }
+        }
       );
-      document.getElementById("myDropdown").classList.toggle("show");
     },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
