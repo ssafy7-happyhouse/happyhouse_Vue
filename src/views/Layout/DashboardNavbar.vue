@@ -57,23 +57,23 @@
                 </b-dropdown-header>
 
                 <b-dropdown-item
-                  v-for="(address, index) in addresses"
-                  :key="index"
+                  v-for="address in addresses"
+                  :key="address.dongCode"
                   @click="moveAddress"
                 >
                   <span>{{ address.gugunName }} {{ address.dongName }}</span>
                 </b-dropdown-item>
 
                 <div class="dropdown-divider"></div>
-                <!-- <b-dropdown-item
-                  v-for="(apartment, index) in apartments"
-                  :key="index"
+                <b-dropdown-item
+                  v-for="apartment in apartments"
+                  :key="apartment.aptCode"
                   @click="moveAddress"
                 >
                   <span name="${apartment.aptCode}">{{
                     apartment.aptName
                   }}</span>
-                </b-dropdown-item> -->
+                </b-dropdown-item>
               </template>
             </ul>
           </b-input-group>
