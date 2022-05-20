@@ -9,6 +9,7 @@
     "dev": "npm run serve"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "bootstrap": "4.3.1",
     "bootstrap-vue": "^2.5.0",
     "chart.js": "^2.9.3",
@@ -54,5 +55,13 @@
     "not ie <= 10"
   ],
   "author": "Creative Tim - https://www.creative-tim.com/",
-  "description": "BootstrapVue Argon Dashboard"
+  "description": "BootstrapVue Argon Dashboard",
+  "eslintConfig": {
+    "globals": {
+      "kakao": false
+    },
+    "rules": {
+      "no-unused-vars": "off"
+    }
+  }
 }
