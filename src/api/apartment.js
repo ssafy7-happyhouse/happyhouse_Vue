@@ -15,4 +15,12 @@ function aptListByName(params, success, fail) {
     .then(success)
     .catch(fail);
 }
-export { aptList, aptListByName };
+
+function aptDetailListByaptCode(params, success, fail) {
+  api
+    .get(`/apartment/deal/${params}`)
+    .then(success)
+    .catch(fail);
+}
+
+export { aptList, aptListByName, aptDetailListByaptCode };
