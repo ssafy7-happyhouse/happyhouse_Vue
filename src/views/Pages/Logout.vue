@@ -6,10 +6,7 @@
         <div class="header-body text-center mb-7">
           <b-row class="justify-content-center">
             <b-col xl="5" lg="6" md="8" class="px-5">
-              <h1 class="text-white">환영합니다!</h1>
-              <p class="text-lead text-white">
-                로그인을 한 후, 다양한 서비스를 즐겨보세요!
-              </p>
+              <h1 class="text-white"></h1>
             </b-col>
           </b-row>
         </div>
@@ -35,36 +32,33 @@
       <b-row class="justify-content-center">
         <b-col lg="5" md="7">
           <b-card no-body class="bg-secondary border-0 mb-0">
-            <b-card-header class="bg-transparent pb-5">
+            <!-- <b-card-header class="bg-transparent pb-5">
               <div class="text-muted text-center mt-2 mb-3"></div>
-              <div class="btn-wrapper text-center">
-                <a href="#" class="btn btn-neutral btn-icon">
+              <div class="btn-wrapper text-center"> -->
+            <!-- <a href="#" class="btn btn-neutral btn-icon">
                   <span class="btn-inner--icon"
                     ><img src="img/icons/common/kakaologo.jpg"
                   /></span>
-                  <span class="btn-inner--text" @click="kakaoLogin"
-                    >카카오톡으로 시작</span
-                  >
-                </a>
-
-                <!-- <a href="#" class="btn btn-neutral btn-icon">
+                  <span class="btn-inner--text">카카오톡으로 시작</span>
+                </a> -->
+            <!-- <a href="#" class="btn btn-neutral btn-icon">
                   <span class="btn-inner--icon"
                     ><img src="img/icons/common/google.svg"
                   /></span>
                   <span class="btn-inner--text">Google</span>
                 </a> -->
-              </div>
-            </b-card-header>
+            <!-- </div>
+            </b-card-header> -->
             <b-card-body class="px-lg-5 py-lg-5">
               <div class="text-center text-muted mb-4">
-                <small>다른 방법으로 로그인</small>
+                <!-- <small>다른 방법으로 로그인</small> -->
               </div>
-              <validation-observer
+              <!-- <validation-observer
                 v-slot="{ handleSubmit }"
                 ref="formValidator"
-              >
-                <b-form role="form" @submit.prevent="handleSubmit(onSubmit)">
-                  <base-input
+              > -->
+              <b-form role="form" @submit.prevent="onSubmit">
+                <!-- <base-input
                     alternative
                     class="mb-3"
                     name="id"
@@ -85,21 +79,18 @@
                     placeholder="Password"
                     v-model="model.password"
                   >
-                  </base-input>
+                  </base-input> -->
 
-                  <!-- <b-form-checkbox v-model="model.rememberMe"
+                <!-- <b-form-checkbox v-model="model.rememberMe"
                     >Remember me</b-form-checkbox
                   > -->
-                  <div class="text-center">
-                    <base-button
-                      type="primary"
-                      native-type="submit"
-                      class="my-4"
-                      >로그인</base-button
-                    >
-                  </div>
-                </b-form>
-              </validation-observer>
+                <div class="text-center">
+                  <base-button type="primary" native-type="submit" class="my-4"
+                    >로그아웃</base-button
+                  >
+                </div>
+              </b-form>
+              <!-- </validation-observer> -->
             </b-card-body>
           </b-card>
           <b-row class="mt-3">
@@ -108,11 +99,11 @@
                 ><small>Forgot password?</small></router-link
               >
             </b-col> -->
-            <b-col cols="7" class="text-right">
+            <!-- <b-col cols="7" class="text-right">
               <router-link to="/register" class=""
                 ><small>회원가입</small></router-link
               >
-            </b-col>
+            </b-col> -->
           </b-row>
         </b-col>
       </b-row>
@@ -121,14 +112,8 @@
 </template>
 <script>
 import { mapState, mapActions } from "vuex";
-import { getKakaoToken, getKakaoUserInfo } from "@/services/kakaoLogin";
 
 const userStore = "userStore";
-// window.Kakao.init("8096ea0691acbe00b8752ac93a7b4f37");
-// kakao.isInitialized();
-
-// console.log(kakao.isInitialized());
-
 export default {
   data() {
     return {
@@ -154,43 +139,6 @@ export default {
         console.log(this.model);
         this.$router.push({ name: "home" });
       }
-    },
-    kakaoLogin() {
-      const param = {
-        redirectUri: "http://localhost:8080/login"
-      };
-      window.Kakao.Auth.authorize(param);
-    },
-    async setKakaoToken() {
-      console.log("카카오 인증 코드", this.$route.query.code);
-      const { data } = await getKakaoToken(this.$route.query.code);
-      if (data.error) {
-        alert("카카오톡 로그인 오류입니다.");
-        this.$router.go();
-        return;
-      }
-      window.Kakao.Auth.setAccessToken(data.access_token);
-      // npm install vue-cookies ?? 아님 세션 ?
-      // this.$cookies.set("access-token", data.access_token, "1d");
-      // this.$cookies.set("refresh-token", data.refresh_token, "1d");
-      await this.setUserInfo();
-      this.$router.push({ name: "home" });
-    },
-    async setUserInfo() {
-      const res = await getKakaoUserInfo();
-      console.log(res);
-      const userInfo = {
-        name: res.kakao_account.profile.nickname,
-        platform: "kakao"
-      };
-      console.log(userInfo);
-      // this.$store.commit("setUser", userInfo);
-    }
-  },
-
-  created() {
-    if (this.$route.query.code) {
-      this.setKakaoToken();
     }
   }
 };

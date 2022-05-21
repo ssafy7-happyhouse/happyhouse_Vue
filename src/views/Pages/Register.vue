@@ -81,7 +81,7 @@
                     placeholder="password"
                     type="password"
                     name="Password"
-                    :rules="{ required: true, min: 6 }"
+                    :rules="{ required: true }"
                     v-model="model.password"
                   >
                   </base-input>
@@ -91,7 +91,7 @@
                     class="mb-3"
                     prepend-icon="ni ni-hat-3"
                     placeholder="Name"
-                    name="Name"
+                    name="name"
                     :rules="{ required: true }"
                     v-model="model.name"
                   >
@@ -102,9 +102,9 @@
                     class="mb-3"
                     prepend-icon="ni ni-email-83"
                     placeholder="Email"
-                    name="Email"
-                    :rules="{ required: true, email: true }"
-                    v-model="model.email"
+                    name="address"
+                    :rules="{ required: true }"
+                    v-model="model.address"
                   >
                   </base-input>
 
@@ -169,7 +169,8 @@
   </div>
 </template>
 <script>
-import http from "@/api/http";
+import { signUp } from "@/api/user.js";
+
 export default {
   name: "register",
   data() {
@@ -187,9 +188,25 @@ export default {
   },
   methods: {
     onSubmit() {
-      http.post("/singUp", model).then(res => {
-        console.log(res);
-      });
+      signUp(
+        this.model,
+        response => {
+          if (response.data === "success") {
+            alert("회원가입이 완료되었습니다.");
+            this.$router.push({ name: "login" });
+          } else if (response.data === "similarlity") {
+            alert("아이디와 비밀번호의 유사도가 높습니다.");
+          } else {
+            alert("회원가입이 실패했습니다.");
+          }
+        },
+        fail => {
+          console.log(fail);
+        }
+      );
+      // http.post("/singUp", model).then(res => {
+      //   console.log(res);
+      // });
       // this will be called only after form is valid. You can do an api call here to register users
     }
   }

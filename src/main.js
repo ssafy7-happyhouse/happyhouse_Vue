@@ -27,6 +27,8 @@ import router from "./routes/router";
 Vue.use(DashboardPlugin);
 Vue.use(BootstrapVue);
 
+window.Kakao.init("8096ea0691acbe00b8752ac93a7b4f37");
+
 /* eslint-disable no-new */
 new Vue({
   store,
