@@ -5,10 +5,12 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 
 import mapStore from "@/store/modules/mapStore";
+import userStore from "@/store/modules/userStore";
 
 const store = new Vuex.Store({
   modules: {
-    mapStore
+    mapStore,
+    userStore
   },
 
   plugins: [createPersistedState]

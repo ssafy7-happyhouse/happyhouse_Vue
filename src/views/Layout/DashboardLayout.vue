@@ -54,8 +54,20 @@
             path: '/login',
             icon: 'ni ni-key-25 text-info'
           }"
+          v-if="!userInfo"
         >
         </sidebar-item>
+
+        <sidebar-item
+          :link="{
+            name: 'Logout',
+            path: '/logout',
+            icon: 'ni ni-key-25 text-info'
+          }"
+          v-else
+        >
+        </sidebar-item>
+
         <sidebar-item
           :link="{
             name: 'Register',
@@ -129,6 +141,9 @@ import DashboardNavbar from "./DashboardNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import { FadeTransition } from "vue2-transitions";
+import { mapState } from "vuex";
+
+const userStore = "userStore";
 
 export default {
   components: {
@@ -147,7 +162,14 @@ export default {
   },
   mounted() {
     this.initScrollbar();
+    // console.log(userInfo);
+  },
+  computed: {
+    ...mapState(userStore, ["userInfo"])
   }
+  // created() {
+  //   console.log(userInfo);
+  // }
 };
 </script>
 <style lang="scss"></style>
