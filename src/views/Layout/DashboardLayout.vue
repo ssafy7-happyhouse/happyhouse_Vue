@@ -112,6 +112,7 @@
           <!-- your content here -->
           <router-view></router-view>
         </fade-transition>
+        <custom-side-bar-right></custom-side-bar-right>
       </div>
       <content-footer v-if="!$route.meta.hideFooter"></content-footer>
     </div>
@@ -142,6 +143,8 @@ import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import { FadeTransition } from "vue2-transitions";
 import { mapState } from "vuex";
+import SideBar from "../../components/SidebarPlugin/SideBar.vue";
+import { CustomSideBarRight } from "@/components";
 
 const userStore = "userStore";
 
@@ -150,7 +153,9 @@ export default {
     DashboardNavbar,
     ContentFooter,
     DashboardContent,
-    FadeTransition
+    FadeTransition,
+    CustomSideBarRight,
+    SideBar
   },
   methods: {
     initScrollbar() {

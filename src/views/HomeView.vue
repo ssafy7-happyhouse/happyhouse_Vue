@@ -20,7 +20,6 @@
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
-import { aptList } from "@/api/apartment";
 
 export default {
   computed: { ...mapState("mapStore", ["map"]) },

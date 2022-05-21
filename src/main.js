@@ -18,11 +18,14 @@ import Vue from "vue";
 import DashboardPlugin from "./plugins/dashboard-plugin";
 import App from "./App.vue";
 import store from "./store";
+import { BootstrapVue } from "bootstrap-vue";
 
 // router setup
 import router from "./routes/router";
+
 // plugin setup
 Vue.use(DashboardPlugin);
+Vue.use(BootstrapVue);
 
 window.Kakao.init("8096ea0691acbe00b8752ac93a7b4f37");
 
