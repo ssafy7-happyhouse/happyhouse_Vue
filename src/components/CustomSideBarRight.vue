@@ -5,20 +5,27 @@
     >
     <div>
       <b-jumbotron style="margin:30px; padding-bottom: 20px;">
-        <template #header>{{ aptName }}</template>
+        <template #header>{{ title }}</template>
         <template #lead>
           {{ aptAddress }}
         </template>
         <hr class="my-4" />
         <div>
-          <b-table striped hover :items="aptList"></b-table>
+          <b-table
+            striped
+            hover
+            :items="aptList"
+            @row-clicked="tableClick"
+          ></b-table>
         </div>
         <div>
           <b-pagination
-            v-model="currentPage"
-            :total-rows="rows"
-            :per-page="perPage"
+            v-model="curPageNum"
+            :total-rows="pages"
+            :per-page="pageSize"
             first-number
+            align="center"
+            @change="pageClick"
           ></b-pagination>
         </div>
       </b-jumbotron>
@@ -35,7 +42,8 @@
 <script>
 import NavbarToggleButton from "@/components/NavbarToggleButton";
 import LineChart from "@/components/Charts/LineChart";
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
+import { aptDetailListByAptCodeAndAptName } from "@/api/apartment";
 
 export default {
   name: "sidebar",
@@ -45,9 +53,8 @@ export default {
   },
   data() {
     return {
-      rows: 100,
-      perPage: 1,
-      currentPage: 2,
+      curPageNum: 1,
+      aptName: "",
       chart: {
         activeIndex: 0,
         chartData: {
@@ -64,36 +71,62 @@ export default {
     };
   },
   computed: {
-    ...mapGetters("mapStore", ["aptName", "aptList", "aptAddress"])
+    ...mapGetters("mapStore", [
+      "title",
+      "aptList",
+      "aptAddress",
+      "currentDongCode",
+      "pageNum",
+      "pageSize",
+      "pages"
+    ])
   },
-
-  props: {
-    logo: {
-      type: String,
-      default: "img/brand/green.png",
-      description: "Sidebar app logo"
-    },
-    autoClose: {
-      type: Boolean,
-      default: true,
-      description:
-        "Whether sidebar should autoclose on mobile when clicking an item"
+  watch: {
+    pageNum(value) {
+      this.curPageNum = value;
     }
   },
-  provide() {
-    return {
-      autoClose: this.autoClose
-    };
-  },
   methods: {
+    ...mapActions("mapStore", [
+      "getAptListByDongCodeAndAptName",
+      "getAptListByDongCode"
+    ]),
+
     closeSidebar() {
       document.getElementById("customSidebar").style.width = "0";
     },
-    showSidebar() {}
-  },
-  beforeDestroy() {
-    if (this.$sidebar.showSidebar) {
-      this.$sidebar.showSidebar = false;
+    tableClick(event) {
+      let dongCode = this.currentDongCode;
+      let pageNum = 1;
+      let pageSize = 6;
+      this.curPageNum = 1;
+      if (Object.keys(event).includes("아파트명")) {
+        let aptName = event.아파트명;
+        this.getAptListByDongCodeAndAptName({
+          dongCode,
+          aptName,
+          pageNum,
+          pageSize
+        });
+        this.aptName = event.아파트명;
+      }
+    },
+    pageClick(event) {
+      let dongCode = this.currentDongCode;
+      let pageNum = event;
+      let pageSize = 6;
+      let aptName = this.title;
+      let address = this.aptAddress;
+      if (address.length > 0) {
+        this.getAptListByDongCodeAndAptName({
+          dongCode,
+          aptName,
+          pageNum,
+          pageSize
+        });
+      } else {
+        this.getAptListByDongCode({ dongCode, pageNum, pageSize });
+      }
     }
   }
 };

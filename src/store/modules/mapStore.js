@@ -1,46 +1,71 @@
 import { API_KEY } from "@/views/Maps/API_KEY";
 import { aptList } from "@/api/apartment";
-import { aptDetailListByaptCode } from "../../api/apartment";
+import {
+  aptDetailListByaptCode,
+  aptListByDongCode,
+  aptDetailListByAptCodeAndAptName
+} from "../../api/apartment";
 
 const mapStore = {
   namespaced: true,
   state: {
-    aptName: null,
+    title: null,
     aptAddress: null,
     map: null,
-    aptDetail: [],
-    aptList: []
+    aptList: [],
+    currentDongCode: "",
+    pageNum: 1,
+    pageSize: 6,
+    pages: 76
   },
 
   getters: {
-    aptName(state) {
-      return state.aptName;
+    title(state) {
+      return state.title;
+    },
+    pageNum(state) {
+      return state.pageNum;
+    },
+    pageSize(state) {
+      return state.pageSize;
+    },
+    pages(state) {
+      return state.pages;
     },
     aptAddress(state) {
       return state.aptAddress;
     },
-    aptDetail(state) {
-      return state.aptDetail;
-    },
     aptList(state) {
       return state.aptList;
+    },
+    currentDongCode(state) {
+      return state.currentDongCode;
     }
   },
 
   mutations: {
+    SET_CURRENTDONGCODE: (state, currentDongCode) => {
+      state.currentDongCode = currentDongCode;
+    },
     SET_MAP: (state, map) => {
       state.map = map;
     },
-    SET_APTDETAIL: (state, aptDetail) => {
-      state.aptDetail = aptDetail;
+    SET_PAGENUM: (state, pageNum) => {
+      state.pageNum = pageNum;
     },
-    SET_APTNAME: (state, aptName) => {
-      state.aptName = aptName;
+    SET_PAGESIZE: (state, pagesize) => {
+      state.pagesize = pagesize;
+    },
+    SET_PAGES: (state, pages) => {
+      state.pages = pages;
+    },
+    SET_TITLE: (state, title) => {
+      state.title = title;
     },
     SET_APTADDRESS: (state, aptAddress) => {
       state.aptAddress = aptAddress;
     },
-    SET_APTLIST: (state, aptDetail) => {
+    SET_APTDETAIL: (state, aptDetail) => {
       let aptList = [];
       aptDetail.forEach(element => {
         aptList.push({
@@ -54,6 +79,20 @@ const mapStore = {
         });
       });
       state.aptList = aptList;
+    },
+    SET_APTLIST: (state, aptListByDong) => {
+      let aptList = [];
+      aptListByDong.forEach(element => {
+        aptList.push({
+          아파트명: element.aptName,
+          건축년도: element.buildYear,
+          지번: element.jibun
+        });
+      });
+      state.aptList = aptList;
+    },
+    SET_MAPLEVEL: state => {
+      state.map.setLevel(2);
     }
   },
 
@@ -62,7 +101,7 @@ const mapStore = {
       const container = document.querySelector("#map-custom");
       const options = {
         center: new kakao.maps.LatLng(35.19656853772262, 129.0807270648317),
-        level: 3
+        level: 4
       };
       let map = new kakao.maps.Map(container, options);
       aptList(response => {
@@ -95,8 +134,10 @@ const mapStore = {
           let latlng = positions[i].latlng;
 
           kakao.maps.event.addListener(marker, "click", function() {
-            dispatch("getAptDetail", aptCode);
-            document.getElementById("customSidebar").style.width = "500px";
+            let pageNum = 1;
+            let pageSize = 6;
+            dispatch("getAptDetail", { aptCode, pageNum, pageSize });
+            commit("SET_MAPLEVEL");
             map.panTo(latlng);
           });
 
@@ -129,22 +170,87 @@ const mapStore = {
         document.head.appendChild(script);
       }
     },
-    getAptDetail: ({ commit }, aptCode) => {
-      let code = aptCode;
+    getAptDetail: ({ commit }, { aptCode, pageNum, pageSize }) => {
       aptDetailListByaptCode(
-        code,
+        aptCode,
+        {
+          pageNum: pageNum,
+          pageSize: pageSize
+        },
         response => {
-          commit("SET_APTNAME", response.data[0].aptName);
+          console.log(response.data);
+          commit("SET_PAGENUM", response.data.pageNum);
+          commit("SET_PAGESIZE", response.data.pageSize);
+          commit("SET_PAGES", response.data.total);
+          commit("SET_TITLE", response.data.list[0].aptName);
+          commit("SET_CURRENTDONGCODE", response.data.list[0].dongCode);
           commit(
             "SET_APTADDRESS",
-            response.data[0].gugunName +
+            response.data.list[0].gugunName +
               " " +
-              response.data[0].dongName +
+              response.data.list[0].dongName +
               " " +
-              response.data[0].jibun
+              response.data.list[0].jibun
           );
-          commit("SET_APTDETAIL", response.data);
-          commit("SET_APTLIST", response.data);
+          commit("SET_APTDETAIL", response.data.list);
+          document.getElementById("customSidebar").style.width = "500px";
+        },
+        error => {}
+      );
+    },
+    getAptListByDongCode: ({ commit }, { dongCode, pageNum, pageSize }) => {
+      aptListByDongCode(
+        dongCode,
+        {
+          pageNum: pageNum,
+          pageSize: pageSize
+        },
+        response => {
+          commit(
+            "SET_TITLE",
+            response.data.list[0].gugunName +
+              " " +
+              response.data.list[0].dongName
+          );
+          commit("SET_PAGENUM", response.data.pageNum);
+          commit("SET_PAGESIZE", response.data.pageSize);
+          commit("SET_PAGES", response.data.total);
+          commit("SET_APTADDRESS", "");
+          commit("SET_CURRENTDONGCODE", dongCode);
+          commit("SET_APTLIST", response.data.list);
+          document.getElementById("myDropdown").classList.remove("show");
+          document.getElementById("customSidebar").style.width = "500px";
+        },
+        error => {}
+      );
+    },
+    getAptListByDongCodeAndAptName: (
+      { commit },
+      { dongCode, aptName, pageNum, pageSize }
+    ) => {
+      aptDetailListByAptCodeAndAptName(
+        {
+          dongCode: dongCode,
+          aptName: aptName
+        },
+        {
+          pageNum: pageNum,
+          pageSize: pageSize
+        },
+        response => {
+          commit("SET_PAGENUM", response.data.pageNum);
+          commit("SET_PAGESIZE", response.data.pageSize);
+          commit("SET_PAGES", response.data.total);
+          commit("SET_TITLE", response.data.list[0].aptName);
+          commit(
+            "SET_APTADDRESS",
+            response.data.list[0].gugunName +
+              " " +
+              response.data.list[0].dongName +
+              " " +
+              response.data.list[0].jibun
+          );
+          commit("SET_APTDETAIL", response.data.list);
         },
         error => {}
       );
