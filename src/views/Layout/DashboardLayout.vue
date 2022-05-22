@@ -45,6 +45,7 @@
             path: '/profile',
             icon: 'ni ni-single-02 text-yellow'
           }"
+          v-if="userInfo"
         >
         </sidebar-item>
 
@@ -59,6 +60,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click="logout"
           :link="{
             name: 'Logout',
             path: '/logout',
@@ -158,6 +160,10 @@ export default {
       if (isWindows) {
         initScrollbar("sidenav");
       }
+    },
+    logout() {
+      sessionStorage.clear();
+      this.$router.push({ name: home });
     }
   },
   mounted() {

@@ -34,10 +34,14 @@ const userStore = {
           if (response.data.message === "success") {
             let token = response.data["access-token"];
             let decode_token = jwt_decode(token);
+            let userInfo = {
+              id: decode_token.userid,
+              platform: "happyhouse"
+            };
 
             commit("SET_IS_LOGIN", true);
             commit("SET_IS_LOGIN_ERROR", false);
-            commit("SET_USER_INFO", decode_token.userid);
+            commit("SET_USER_INFO", userInfo);
 
             sessionStorage.setItem("access-token", token);
             console.log(response);

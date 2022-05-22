@@ -38,13 +38,10 @@
             <b-card-header class="bg-transparent pb-5">
               <div class="text-muted text-center mt-2 mb-3"></div>
               <div class="btn-wrapper text-center">
-                <a href="#" class="btn btn-neutral btn-icon">
-                  <span class="btn-inner--icon"
-                    ><img src="img/icons/common/kakaologo.jpg"
-                  /></span>
+                <a href="#" class="btn btn-icon">
                   <span class="btn-inner--text" @click="kakaoLogin"
-                    >카카오톡으로 시작</span
-                  >
+                    ><img src="img/icons/common/kakaoLogo.png"
+                  /></span>
                 </a>
 
                 <!-- <a href="#" class="btn btn-neutral btn-icon">
@@ -120,8 +117,9 @@
   </div>
 </template>
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 import { getKakaoToken, getKakaoUserInfo } from "@/services/kakaoLogin";
+import VueCookies from "vue-cookies";
 
 const userStore = "userStore";
 // window.Kakao.init("8096ea0691acbe00b8752ac93a7b4f37");
@@ -144,6 +142,7 @@ export default {
   },
   methods: {
     ...mapActions(userStore, ["userConfirm", "getUserInfo"]),
+    ...mapMutations(userStore, ["SET_USER_INFO"]),
     async onSubmit() {
       // this will be called only after form is valid. You can do api call here to login
       await this.userConfirm(this.model);
@@ -170,9 +169,11 @@ export default {
         return;
       }
       window.Kakao.Auth.setAccessToken(data.access_token);
-      // npm install vue-cookies ?? 아님 세션 ?
       // this.$cookies.set("access-token", data.access_token, "1d");
       // this.$cookies.set("refresh-token", data.refresh_token, "1d");
+      // 일단은 자동 로그인 되지 않게 하기 위헤 세션에 저장
+      sessionStorage.setItem("access-token", data.access_token);
+      sessionStorage.setItem("refresh-token", data.refresh_token);
       await this.setUserInfo();
       this.$router.push({ name: "home" });
     },
@@ -180,11 +181,12 @@ export default {
       const res = await getKakaoUserInfo();
       console.log(res);
       const userInfo = {
-        name: res.kakao_account.profile.nickname,
+        id: res.kakao_account.profile.nickname,
         platform: "kakao"
       };
+      // this.$store.commit("SET_USER_INFO", userInfo);
+      this.SET_USER_INFO(userInfo);
       console.log(userInfo);
-      // this.$store.commit("setUser", userInfo);
     }
   },
 
