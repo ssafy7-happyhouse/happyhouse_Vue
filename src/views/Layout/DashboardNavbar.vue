@@ -57,23 +57,36 @@
                 </b-dropdown-header>
 
                 <b-dropdown-item
-                  v-for="(address, index) in addresses"
-                  :key="index"
-                  @click="moveAddress"
+                  v-for="address in addresses"
+                  :key="address.dongCode"
+                  @click="
+                    moveAddress(
+                      address.dongCode,
+                      address.gugunName,
+                      address.dongName
+                    )
+                  "
                 >
                   <span>{{ address.gugunName }} {{ address.dongName }}</span>
                 </b-dropdown-item>
 
                 <div class="dropdown-divider"></div>
-                <!-- <b-dropdown-item
-                  v-for="(apartment, index) in apartments"
-                  :key="index"
-                  @click="moveAddress"
+
+                <b-dropdown-header class="noti-title">
+                  <h6 class="text-overflow m-0">아파트</h6>
+                </b-dropdown-header>
+
+                <b-dropdown-item
+                  v-for="apartment in apartments"
+                  :key="apartment.aptCode"
+                  @click="
+                    moveApt(apartment.aptCode, apartment.lat, apartment.lng)
+                  "
                 >
                   <span name="${apartment.aptCode}">{{
                     apartment.aptName
                   }}</span>
-                </b-dropdown-item> -->
+                </b-dropdown-item>
               </template>
             </ul>
           </b-input-group>
@@ -88,7 +101,7 @@ import { CollapseTransition } from "vue2-transitions";
 import { BaseNav, Modal } from "@/components";
 import { dongList } from "@/api/address";
 import { aptListByName } from "@/api/apartment";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 export default {
   components: {
@@ -119,41 +132,60 @@ export default {
       searchModalVisible: false,
       searchQuery: "",
       addresses: [],
-      apartments: []
+      apartments: [],
+      aptList: []
     };
   },
   methods: {
+    ...mapActions("mapStore", ["getAptDetail", "getAptListByDongCode"]),
     search() {
       document.getElementById("myDropdown").classList.toggle("show");
       dongList(
-        this.searchQuery,
+        this.searchQuery == "" ? "ASDFASDF" : this.searchQuery,
         response => {
           this.addresses = response.data;
         },
         error => {}
       );
       aptListByName(
-        this.searchQuery,
+        this.searchQuery == "" ? "ASDFASDF" : this.searchQuery,
         response => {
           this.apartments = response.data;
         },
         error => {}
       );
     },
-    moveAddress(event) {
+    moveApt(aptCode, lat, lng, event) {
+      document.getElementById("myDropdown").classList.remove("show");
+      document.getElementById("customSidebar").style.width = "500px";
+      let pageNum = 1;
+      let pageSize = 6;
+      this.getAptDetail({ aptCode, pageNum, pageSize });
+      this.map.setLevel(2);
+      this.map.panTo(new kakao.maps.LatLng(lat, lng));
+      this.addresses = [];
+      this.apartments = [];
+    },
+    moveAddress(dongCode, gugunName, dongName) {
       const geocoder = new kakao.maps.services.Geocoder();
+      let pageNum = 1;
+      let pageSize = 6;
+      this.getAptListByDongCode({ dongCode, pageNum, pageSize });
+
       // 주소로 좌표를 검색합니다
       const map = this.map;
-      geocoder.addressSearch(
-        event.currentTarget.getElementsByTagName("span")[0].innerHTML,
-        function(result, status) {
-          // 정상적으로 검색이 완료됐으면
-          if (status === kakao.maps.services.Status.OK) {
-            map.setCenter(new kakao.maps.LatLng(result[0].y, result[0].x));
-            document.getElementById("myDropdown").classList.toggle("show");
-          }
+      geocoder.addressSearch(gugunName + " " + dongName, function(
+        result,
+        status
+      ) {
+        // 정상적으로 검색이 완료됐으면
+        if (status === kakao.maps.services.Status.OK) {
+          map.panTo(new kakao.maps.LatLng(result[0].y, result[0].x));
+          map.setLevel(3);
         }
-      );
+      });
+      this.addresses = [];
+      this.apartments = [];
     },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
@@ -164,6 +196,12 @@ export default {
     closeDropDown() {
       this.activeNotifications = false;
     }
+  }
+};
+
+window.onclick = e => {
+  if (e.target.class != "myDropdown") {
+    document.getElementById("myDropdown").classList.remove("show");
   }
 };
 </script>

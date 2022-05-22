@@ -15,4 +15,38 @@ function aptListByName(params, success, fail) {
     .then(success)
     .catch(fail);
 }
-export { aptList, aptListByName };
+
+function aptDetailListByaptCode(params, page, success, fail) {
+  api
+    .get(
+      `/apartment/deal/${params}?pageNum=${page.pageNum}&pageSize=${page.pageSize}`
+    )
+    .then(success)
+    .catch(fail);
+}
+
+function aptListByDongCode(params, page, success, fail) {
+  api
+    .get(
+      `/apartment/dong/${params}?pageNum=${page.pageNum}&pageSize=${page.pageSize}`
+    )
+    .then(success)
+    .catch(fail);
+}
+
+function aptDetailListByAptCodeAndAptName(params, page, success, fail) {
+  api
+    .get(
+      `/apartment/dong/${params.dongCode}/name/${params.aptName}?pageNum=${page.pageNum}&pageSize=${page.pageSize}`
+    )
+    .then(success)
+    .catch(fail);
+}
+
+export {
+  aptList,
+  aptListByName,
+  aptDetailListByaptCode,
+  aptListByDongCode,
+  aptDetailListByAptCodeAndAptName
+};

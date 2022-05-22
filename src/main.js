@@ -19,15 +19,18 @@ import DashboardPlugin from "./plugins/dashboard-plugin";
 import App from "./App.vue";
 import store from "./store";
 import VueCookies from "vue-cookies";
+import { BootstrapVue } from "bootstrap-vue";
 
 // router setup
 import router from "./routes/router";
+
 // plugin setup
 Vue.use(DashboardPlugin);
 Vue.use(VueCookies);
 
 //쿠키의 만료일은 7일이다. (글로벌 세팅)
 Vue.$cookies.config("7d");
+Vue.use(BootstrapVue);
 
 window.Kakao.init("8096ea0691acbe00b8752ac93a7b4f37");
 
