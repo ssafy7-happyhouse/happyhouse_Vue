@@ -24,6 +24,20 @@ async function signUp(user, success, fail) {
     .catch(fail);
 }
 
+async function getMyInfo(success, fail) {
+  await api
+    .get(`/user/showInfo`)
+    .then(success)
+    .catch(fail);
+}
+
+async function updateMyInfo(userInfo, success, fail) {
+  await api
+    .put("/user/updateInfo", JSON.stringify(userInfo))
+    .then(success)
+    .catch(fail);
+}
+
 // function logout(success, fail)
 
-export { login, signUp };
+export { login, findById, signUp, getMyInfo, updateMyInfo };

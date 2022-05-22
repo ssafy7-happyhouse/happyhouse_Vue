@@ -57,7 +57,7 @@
                 v-slot="{ handleSubmit }"
                 ref="formValidator"
               > -->
-              <b-form role="form" @submit.prevent="onSubmit">
+              <b-form role="form" @submit.prevent="logout">
                 <!-- <base-input
                     alternative
                     class="mb-3"
@@ -111,35 +111,27 @@
   </div>
 </template>
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapMutations, mapState } from "vuex";
 
 const userStore = "userStore";
+
 export default {
-  data() {
-    return {
-      model: {
-        id: "",
-        password: ""
-        // rememberMe: false
-      }
-    };
-  },
   computed: {
-    ...mapState(userStore, ["isLogin", "isLoginError"])
+    ...mapState(userStore, ["userInfo"])
   },
   methods: {
-    ...mapActions(userStore, ["userConfirm", "getUserInfo"]),
-    async onSubmit() {
-      // this will be called only after form is valid. You can do api call here to login
-      await this.userConfirm(this.model);
-      let token = sessionStorage.getItem("access-token");
-      if (this.isLogin) {
-        // await this.getUserInfo(token);
-        console.log(token);
-        console.log(this.model);
-        this.$router.push({ name: "home" });
+    ...mapMutations(userStore, ["SET_USER_INFO"]),
+    logout() {
+      if (sessionStorage.getItem("refresh-token")) {
+        Kakao.Auth.logout(function() {});
       }
+      sessionStorage.clear();
+      this.SET_USER_INFO(null);
+      this.$router.push({ name: "home" });
     }
+  },
+  created() {
+    this.logout();
   }
 };
 </script>
