@@ -45,12 +45,20 @@
             >
             </b-form-input>
 
-            <div class="input-group-append">
+            <div
+              class="input-group-append"
+              @click="search"
+              style="cursor:pointer;"
+            >
               <span class="input-group-text"
                 ><i class="fas fa-search"></i
               ></span>
             </div>
-            <ul class="dropdown-menu" id="myDropdown" style="z-index: 3;">
+            <ul
+              class="dropdown-menu"
+              id="myDropdown"
+              style="z-index: 3; height: 400px; overflow: scroll; overflow-x: hidden;"
+            >
               <template>
                 <b-dropdown-header class="noti-title">
                   <h6 class="text-overflow m-0">주소</h6>
@@ -89,11 +97,27 @@
                 </b-dropdown-item>
               </template>
             </ul>
-          </b-input-group>
-        </b-form-group>
+          </b-input-group> </b-form-group
+        ><base-button
+          type="secondary"
+          style="margin-left: 10px;"
+          @click="filterClick"
+          >filter</base-button
+        >
       </b-form>
     </b-navbar-nav>
     <b-navbar-nav class="align-items-center ml-md-auto"> </b-navbar-nav>
+    <div>
+      <b-modal id="alert-modal" ref="alert-modal" hide-footer>
+        <template #modal-title> 경고! </template>
+        <div class="d-block text-center">
+          <h3>{{ alertMessage }}</h3>
+        </div>
+        <b-button class="mt-3" block @click="$bvModal.hide('alert-modal')"
+          >Close</b-button
+        >
+      </b-modal>
+    </div>
   </base-nav>
 </template>
 <script>
@@ -133,12 +157,25 @@ export default {
       searchQuery: "",
       addresses: [],
       apartments: [],
-      aptList: []
+      aptList: [],
+      alertMessage: ""
     };
   },
   methods: {
     ...mapActions("mapStore", ["getAptDetail", "getAptListByDongCode"]),
+    filterClick() {
+      if (document.getElementById("custom-filter").style.left == "5%") {
+        document.getElementById("custom-filter").style.left = "-40%";
+      } else {
+        document.getElementById("custom-filter").style.left = "5%";
+      }
+    },
     search() {
+      if (this.searchQuery.length < 2) {
+        this.$refs["alert-modal"].show();
+        this.alertMessage = "두 글자 이상 입력해주세요.";
+        return;
+      }
       document.getElementById("myDropdown").classList.toggle("show");
       dongList(
         this.searchQuery == "" ? "ASDFASDF" : this.searchQuery,
@@ -157,7 +194,8 @@ export default {
     },
     moveApt(aptCode, lat, lng, event) {
       document.getElementById("myDropdown").classList.remove("show");
-      document.getElementById("customSidebar").style.width = "500px";
+      document.getElementById("customSidebar").style.width = "25%";
+
       let pageNum = 1;
       let pageSize = 6;
       this.getAptDetail({ aptCode, pageNum, pageSize });

@@ -1765,6 +1765,11 @@
   "resolved" "https://registry.npmjs.org/boolbase/-/boolbase-1.0.0.tgz"
   "version" "1.0.0"
 
+"bootstrap-slider@^10.6.0":
+  "integrity" "sha512-8JTPZB9QVOdrGzYF3YgC3YW6ssfPeBvBwZnXffiZ7YH/zz1D0EKlZvmQsm/w3N0XjVNYQEoQ0ax+jHrErV4K1Q=="
+  "resolved" "https://registry.npmjs.org/bootstrap-slider/-/bootstrap-slider-10.6.2.tgz"
+  "version" "10.6.2"
+
 "bootstrap-vue@^2.5.0":
   "integrity" "sha512-LixZePxJqIkwsha2WAjAu7ZDH+oJ+JLxPGsl1SIbWebcEYZ+QtGx4JM2nR287t/0uWYGO+/oJ0KlaSO662VtLA=="
   "resolved" "https://registry.npmjs.org/bootstrap-vue/-/bootstrap-vue-2.5.0.tgz"
@@ -2551,6 +2556,11 @@
   "integrity" "sha512-I39t74+4t+zau64EN1fE5v2W31Adtc/REhzWN+gWRRXg6WH5qAsZm62DHpQ1+Yhe4047T55jvzz7MUqF/dBBlA=="
   "resolved" "https://registry.npmjs.org/core-js/-/core-js-2.6.10.tgz"
   "version" "2.6.10"
+
+"core-js@^3.6.5":
+  "integrity" "sha512-2IGcGH00z9I4twgNWU4uGCNEsBFG1s2JudVQrgSCoVhOfwoTwQjxC8aMo9exrpTMOxvobggEpaHnGMmQY4cfBQ=="
+  "resolved" "https://registry.npmjs.org/core-js/-/core-js-3.22.6.tgz"
+  "version" "3.22.6"
 
 "core-util-is@~1.0.0", "core-util-is@1.0.2":
   "integrity" "sha1-tf1UIgqivFq1eqtxQMlAdUUDwac="
@@ -4268,7 +4278,7 @@
   "resolved" "https://registry.npmjs.org/flatpickr/-/flatpickr-4.6.3.tgz"
   "version" "4.6.3"
 
-"flatted@^3.2.5":
+"flatted@^3.1.0", "flatted@^3.2.5":
   "integrity" "sha512-WIWGi2L3DyTUvUrwRKgGi9TwxQMUEqPOPQBVi71R96jZXJdFskXEmf54BoZaS1kknGODoIGASGEzBUYdyMCBJg=="
   "resolved" "https://registry.npmjs.org/flatted/-/flatted-3.2.5.tgz"
   "version" "3.2.5"
@@ -8979,10 +8989,23 @@
   "resolved" "https://registry.npmjs.org/vm-browserify/-/vm-browserify-1.1.2.tgz"
   "version" "1.1.2"
 
+"vue-bootstrap-slider@^2.1.8":
+  "integrity" "sha512-UwV/T+Fy8jhlHLOVL5MPp5yl076u1FUM0WeK/ScD267XODrvvpy/xioL16ZgKUQPvu+3Bok8lR39Z6hiTGeUSQ=="
+  "resolved" "https://registry.npmjs.org/vue-bootstrap-slider/-/vue-bootstrap-slider-2.1.8.tgz"
+  "version" "2.1.8"
+  dependencies:
+    "bootstrap-slider" "^10.6.0"
+    "lodash" "^4.17.11"
+
 "vue-chartjs@^3.5.0":
   "integrity" "sha512-yWNhG3B6g6lvYqNInP0WaDWNZG/SNb6XnltkjR0wYC5pmLm6jvdiotj8er7Mui8qkJGfLZe6ULjrZdHWjegAUg=="
   "resolved" "https://registry.npmjs.org/vue-chartjs/-/vue-chartjs-3.5.0.tgz"
   "version" "3.5.0"
+
+"vue-class-component@^7.1.0":
+  "integrity" "sha512-+eaQXVrAm/LldalI272PpDe3+i4mPis0ORiMYxF6Ae4hyuCh15W8Idet7wPUEs4N4YptgFHGys4UrgNQOMyO6w=="
+  "resolved" "https://registry.npmjs.org/vue-class-component/-/vue-class-component-7.2.6.tgz"
+  "version" "7.2.6"
 
 "vue-clipboard2@^0.3.0":
   "integrity" "sha512-H5S/agEDj0kXjUb5GP2c0hCzIXWRBygaWLN3NEFsaI9I3uWin778SFEMt8QRXiPG+7anyjqWiw2lqcxWUSfkYg=="
@@ -9036,10 +9059,25 @@
     "vue-hot-reload-api" "^2.3.0"
     "vue-style-loader" "^4.1.0"
 
+"vue-property-decorator@^8.0.0":
+  "integrity" "sha512-O6OUN2OMsYTGPvgFtXeBU3jPnX5ffQ9V4I1WfxFQ6dqz6cOUbR3Usou7kgFpfiXDvV7dJQSFcJ5yUPgOtPPm1Q=="
+  "resolved" "https://registry.npmjs.org/vue-property-decorator/-/vue-property-decorator-8.5.1.tgz"
+  "version" "8.5.1"
+  dependencies:
+    "vue-class-component" "^7.1.0"
+
 "vue-router@^3.0.6":
   "integrity" "sha512-8iSa4mGNXBjyuSZFCCO4fiKfvzqk+mhL0lnKuGcQtO1eoj8nq3CmbEG8FwK5QqoqwDgsjsf1GDuisDX4cdb/aQ=="
   "resolved" "https://registry.npmjs.org/vue-router/-/vue-router-3.1.3.tgz"
   "version" "3.1.3"
+
+"vue-slider-component@^3.2.15":
+  "integrity" "sha512-FpmMsQ6MQFn22B6boDcEjRmuawdaHwjHRVZiuv5w37jijHra6+HogjSrh3mb42jE+PUIFFagXi36oFEzpDbadg=="
+  "resolved" "https://registry.npmjs.org/vue-slider-component/-/vue-slider-component-3.2.15.tgz"
+  "version" "3.2.15"
+  dependencies:
+    "core-js" "^3.6.5"
+    "vue-property-decorator" "^8.0.0"
 
 "vue-style-loader@^4.1.0":
   "integrity" "sha512-0ip8ge6Gzz/Bk0iHovU9XAUQaFt/G2B61bnWa2tCcqqdgfHs1lF9xXorFbE55Gmy92okFT+8bfmySuUOu13vxQ=="
@@ -9062,7 +9100,7 @@
   "resolved" "https://registry.npmjs.org/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz"
   "version" "1.9.1"
 
-"vue@^2.0.0", "vue@^2.5.18", "vue@^2.5.2", "vue@^2.6.11":
+"vue@*", "vue@^2.0.0", "vue@^2.5.18", "vue@^2.5.2", "vue@^2.6.11":
   "integrity" "sha512-VfPwgcGABbGAue9+sfrD4PuwFar7gPb1yl1UK1MwXoQPAw0BKSqWfoYCT/ThFrdEVWoI51dBuyCoiNU9bZDZxQ=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-2.6.11.tgz"
   "version" "2.6.11"
