@@ -12,19 +12,7 @@
       {{ $route.name }}
     </a>
     <!-- Navbar links -->
-    <b-navbar-nav class="align-items-center ml-md-auto">
-      <!-- This item dont have <b-nav-item> because item have data-action/data-target on tag <a>, wich we cant add -->
-      <!-- <li class="nav-item d-sm-none">
-        <a
-          class="nav-link"
-          href="#"
-          data-action="search-show"
-          data-target="#navbar-search-main"
-        >
-          <i class="ni ni-zoom-split-in"></i>
-        </a>
-      </li> -->
-    </b-navbar-nav>
+    <b-navbar-nav class="align-items-center ml-md-auto"> </b-navbar-nav>
     <b-navbar-nav class="align-items-center ml-mr-auto ml-md-0">
       <b-form
         class="navbar-search form-inline mr-sm-3"
@@ -164,10 +152,10 @@ export default {
   methods: {
     ...mapActions("mapStore", ["getAptDetail", "getAptListByDongCode"]),
     filterClick() {
-      if (document.getElementById("custom-filter").style.left == "5%") {
-        document.getElementById("custom-filter").style.left = "-40%";
+      if (document.getElementById("custom-filter").style.left == "50px") {
+        document.getElementById("custom-filter").style.left = "-80%";
       } else {
-        document.getElementById("custom-filter").style.left = "5%";
+        document.getElementById("custom-filter").style.left = "50px";
       }
     },
     search() {
@@ -194,7 +182,7 @@ export default {
     },
     moveApt(aptCode, lat, lng, event) {
       document.getElementById("myDropdown").classList.remove("show");
-      document.getElementById("customSidebar").style.width = "25%";
+      document.getElementById("customSidebar").style.width = "500px";
 
       let pageNum = 1;
       let pageSize = 6;

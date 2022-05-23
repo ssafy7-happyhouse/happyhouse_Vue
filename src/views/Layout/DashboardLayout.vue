@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <notifications></notifications>
-    <side-bar>
+    <side-bar style="z-index:1090;">
       <template slot="links">
         <sidebar-item
           :link="{
@@ -91,7 +91,7 @@
         <div
           id="custom-filter"
           style="height:400px; width:300px; background-color: white; position: absolute;  transition: 0.5s; 
- left:-40%; top:20%; padding:30px; border-radius: 10px;"
+ left:-80%; top:20%; padding:30px; border-radius: 10px;"
         >
           <div class="mb-5">
             <h5>
@@ -302,4 +302,10 @@ export default {
   // }
 };
 </script>
-<style lang="scss"></style>
+<style>
+.custom-marker {
+  font-size: x-small;
+  position: relative;
+  bottom: 10px;
+}
+</style>
