@@ -102,6 +102,7 @@
               v-model="value_1"
               :min="0"
               :max="300"
+              :interval="50"
               :marks="marks_1"
             ></vue-slider>
           </div>
@@ -113,7 +114,7 @@
               v-model="value_2"
               :min="0"
               :max="30"
-              :interval="0.1"
+              :interval="5"
               :marks="marks_2"
             ></vue-slider>
           </div>
@@ -125,7 +126,8 @@
             <vue-slider
               v-model="value_3"
               :min="0"
-              :max="22"
+              :max="21"
+              :interval="3"
               :marks="marks_3"
             ></vue-slider>
           </div>
@@ -196,10 +198,10 @@ export default {
     return {
       value_1: [0, 300],
       value_2: [0, 30],
-      value_3: [0, 22],
+      value_3: [0, 21],
       marks_1: [0, 50, 100, 150, 200, 250, 300],
       marks_2: [0, 5, 10, 15, 20, 25, 30],
-      marks_3: [0, 3, 6, 9, 12, 15, 18, 22]
+      marks_3: [0, 3, 6, 9, 12, 15, 18, 21]
     };
   },
   filters: {
@@ -209,12 +211,16 @@ export default {
   },
   watch: {
     value_1(val) {
+      this.REMOVE_CLUSTERER;
+      this.REMOVE_OVERLAYS;
       this.REMOVE_MARKERS;
       let minAmount = this.value_2[0] * 10000;
       let maxAmount = this.value_2[1] * 10000;
       let minBuildYear = this.value_3[0] + 2000;
       let maxBuildYear = this.value_3[1] + 2000;
+
       this.makeMarker({
+        clusterer: this.clusterer,
         map: this.map,
         minAmount: minAmount,
         maxAmount: maxAmount,
@@ -225,12 +231,16 @@ export default {
       });
     },
     value_2(val) {
+      this.REMOVE_CLUSTERER;
+      this.REMOVE_OVERLAYS;
       this.REMOVE_MARKERS;
       let minArea = this.value_1[0];
       let maxArea = this.value_1[1];
       let minBuildYear = this.value_3[0] + 2000;
       let maxBuildYear = this.value_3[1] + 2000;
+
       this.makeMarker({
+        clusterer: this.clusterer,
         map: this.map,
         minAmount: val[0] * 10000,
         maxAmount: val[1] * 10000,
@@ -241,12 +251,16 @@ export default {
       });
     },
     value_3(val) {
+      this.REMOVE_CLUSTERER;
+      this.REMOVE_OVERLAYS;
       this.REMOVE_MARKERS;
       let minArea = this.value_1[0];
       let maxArea = this.value_1[1];
       let minAmount = this.value_2[0] * 10000;
       let maxAmount = this.value_2[1] * 10000;
+
       this.makeMarker({
+        clusterer: this.clusterer,
         map: this.map,
         minAmount: minAmount,
         maxAmount: maxAmount,
@@ -263,10 +277,14 @@ export default {
       document.getElementById("custom-filter").style.left = "-40%";
     },
     filterReset() {
+      this.REMOVE_CLUSTERER;
+      this.REMOVE_OVERLAYS;
+      this.REMOVE_MARKERS;
       this.value_1 = [0, 300];
       this.value_2 = [0, 30];
-      this.value_3 = [0, 22];
+      this.value_3 = [0, 21];
       this.makeMarker({
+        clusterer: this.clusterer,
         map: this.map,
         minAmount: 0,
         maxAmount: 300000,
@@ -292,10 +310,14 @@ export default {
     // console.log(userInfo);
   },
   computed: {
-    ...mapMutations("mapStore", ["REMOVE_MARKERS"]),
+    ...mapMutations("mapStore", [
+      "REMOVE_MARKERS",
+      "REMOVE_OVERLAYS",
+      "REMOVE_CLUSTERER"
+    ]),
 
     ...mapState(userStore, ["userInfo"]),
-    ...mapState("mapStore", ["map"])
+    ...mapState("mapStore", ["map", "clusterer"])
   }
   // created() {
   //   console.log(userInfo);
@@ -307,5 +329,8 @@ export default {
   font-size: x-small;
   position: relative;
   bottom: 10px;
+}
+.marker-image {
+  height: 40px;
 }
 </style>

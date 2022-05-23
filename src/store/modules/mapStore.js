@@ -12,8 +12,10 @@ const mapStore = {
   state: {
     title: null,
     aptAddress: null,
+    clusterer: null,
     map: null,
     markers: [],
+    overlays: [],
     aptList: [],
     currentDongCode: "",
     pageNum: 1,
@@ -30,6 +32,9 @@ const mapStore = {
     },
     markers(state) {
       return state.markers;
+    },
+    overlays(state) {
+      return state.overlays;
     },
     pageNum(state) {
       return state.pageNum;
@@ -58,6 +63,9 @@ const mapStore = {
     SET_MAP: (state, map) => {
       state.map = map;
     },
+    SET_CLUSTERER: (state, clusterer) => {
+      state.clusterer = clusterer;
+    },
     SET_PAGENUM: (state, pageNum) => {
       state.pageNum = pageNum;
     },
@@ -76,19 +84,31 @@ const mapStore = {
     SET_MARKERS: (state, marker) => {
       state.markers.push(marker);
     },
+    SET_OVERLAYS: (state, overlay) => {
+      state.overlays.push(overlay);
+    },
     REMOVE_MARKERS: state => {
       state.markers.forEach(marker => {
         marker.setMap(null);
       });
       state.markers = [];
     },
+    REMOVE_OVERLAYS: state => {
+      state.overlays.forEach(overlay => {
+        overlay.setMap(null);
+      });
+      state.overlays = [];
+    },
+    REMOVE_CLUSTERER: state => {
+      state.clusterer.clear();
+    },
     SET_APTDETAIL: (state, aptDetail) => {
       let aptList = [];
       aptDetail.forEach(element => {
         aptList.push({
           계약년월: element.dealYear + "/" + element.dealMonth,
-          가격: element.dealAmount,
-          면적: element.area,
+          가격: Math.round(element.dealAmount / 100) / 100 + "억",
+          면적: element.area + "m²",
           층:
             (element.floor < 0
               ? "지하 " + Math.abs(element.floor)
@@ -331,7 +351,15 @@ const mapStore = {
         level: 4
       };
       let map = new kakao.maps.Map(container, options);
+      var clusterer = new kakao.maps.MarkerClusterer({
+        map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
+        averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
+        minLevel: 4, // 클러스터 할 최소 지도 레벨
+        texts: count => count / 2,
+        minClusterSize: 3
+      });
       dispatch("makeMarker", {
+        clusterer,
         map,
         minAmount,
         maxAmount,
@@ -340,11 +368,13 @@ const mapStore = {
         minBuildYear,
         maxBuildYear
       });
-      return commit("SET_MAP", map);
+      commit("SET_CLUSTERER", clusterer);
+      commit("SET_MAP", map);
     },
     makeMarker(
       { commit, dispatch },
       {
+        clusterer,
         map,
         minAmount,
         maxAmount,
@@ -365,6 +395,7 @@ const mapStore = {
         },
         response => {
           let positions = [];
+          console.log(response.data);
 
           response.data.forEach(element => {
             positions.push({
@@ -375,12 +406,22 @@ const mapStore = {
             });
           });
 
-          // // 마커 클러스터러를 생성합니다
-          // var clusterer = new kakao.maps.MarkerClusterer({
-          //   map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
-          //   averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
-          //   minLevel: 4 // 클러스터 할 최소 지도 레벨
-          // });
+          kakao.maps.event.addListener(clusterer, "clustered", clusters => {
+            clusters.forEach(eleCluster => {
+              let sum = 0;
+              eleCluster._markers.forEach(marker => {
+                if (marker.cc) {
+                  let startIndex = marker.cc.indexOf(">");
+                  let endIndex = marker.cc.indexOf("억");
+                  sum += Number(marker.cc.substring(startIndex + 1, endIndex));
+                }
+              });
+              eleCluster._content.innerHTML =
+                Math.round((sum / (eleCluster._markers.length / 2)) * 100) /
+                  100 +
+                "억";
+            });
+          });
 
           for (let i = 0; i < positions.length; i++) {
             // 마커 이미지의 이미지 크기 입니다
@@ -410,20 +451,22 @@ const mapStore = {
 
             var content =
               "<div class=custom-marker style='color:white'>" +
-              (positions[i].avgAmount / 10000).toFixed(2) +
+              +Math.round(positions[i].avgAmount / 100) / 100 +
               "억</div>";
 
             var overlay = new kakao.maps.CustomOverlay({
               content: content,
               map: map,
-              position: new kakao.maps.LatLng(
-                marker.getPosition().Ma,
-                marker.getPosition().La
-              )
+              position: latlng,
+              value: Math.round(positions[i].avgAmount / 100) / 100
             });
-            // clusterer.addMarker(marker);
+
+            clusterer.addMarker(marker);
 
             overlay.setMap(map);
+            clusterer.addMarker(overlay);
+
+            commit("SET_OVERLAYS", overlay);
 
             kakao.maps.event.addListener(marker, "mouseover", function() {
               // console.log("marker mouseover!");
