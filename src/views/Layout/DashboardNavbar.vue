@@ -197,7 +197,6 @@ export default {
       let pageNum = 1;
       let pageSize = 6;
       this.getAptListByDongCode({ dongCode, pageNum, pageSize });
-
       // 주소로 좌표를 검색합니다
       const map = this.map;
       geocoder.addressSearch(gugunName + " " + dongName, function(

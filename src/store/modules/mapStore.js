@@ -591,7 +591,7 @@ const mapStore = {
           commit("SET_CURRENTDONGCODE", dongCode);
           commit("SET_APTLIST", response.data.list);
           document.getElementById("myDropdown").classList.remove("show");
-          document.getElementById("customSidebar").style.width = "500";
+          document.getElementById("customSidebar").style.width = "500px";
         },
         error => {}
       );
