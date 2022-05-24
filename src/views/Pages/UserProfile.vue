@@ -34,7 +34,7 @@
         </b-col> -->
         <b-col style="margin-left:10%; margin-right:10%;">
           <edit-kakao-profile-form
-            v-if="userInfo.platform"
+            v-if="isKakao(userInfo.platform)"
           ></edit-kakao-profile-form>
           <edit-profile-form v-else></edit-profile-form>
         </b-col>
@@ -58,8 +58,11 @@ export default {
   computed: {
     ...mapState("userStore", ["userInfo"])
   },
-  created() {
-    alert(userInfo);
+  methods: {
+    isKakao(platform) {
+      if (platform === "kakao") return true;
+      else false;
+    }
   }
 };
 </script>
