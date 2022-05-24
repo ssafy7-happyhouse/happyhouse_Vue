@@ -15,6 +15,7 @@ export default {
       ctx: null
     };
   },
+
   mounted() {
     this.$watch(
       "chartData",

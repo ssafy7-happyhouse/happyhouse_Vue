@@ -460,9 +460,8 @@ const mapStore = {
             let markerClick = function() {
               let pageNum = 1;
               let pageSize = 6;
-              dispatch("getAptDetail", { aptCode, pageNum, pageSize });
-              dispatch("getAptDealByAptCode", { aptCode });
-              commit("SET_MAPLEVEL");
+              dispatch("getAptDealByAptCode", { aptCode, pageNum, pageSize });
+              // commit("SET_MAPLEVEL");
               map.panTo(latlng);
             };
 
@@ -516,10 +515,13 @@ const mapStore = {
       );
     },
 
-    getAptDealByAptCode({ commit }, { aptCode }) {
+    async getAptDealByAptCode(
+      { commit, dispatch },
+      { aptCode, pageNum, pageSize }
+    ) {
       commit("REMOVE_CHARTDATA");
 
-      aptDealByAptCode(
+      await aptDealByAptCode(
         { aptCode },
         response => {
           response.data.forEach(element => {
@@ -534,7 +536,7 @@ const mapStore = {
         },
         error => {}
       );
-      vm.$forceUpdate();
+      dispatch("getAptDetail", { aptCode, pageNum, pageSize });
     },
     getMap({ dispatch }) {
       let minAmount = 0;

@@ -29,14 +29,22 @@
           ></b-pagination>
         </div>
       </b-jumbotron>
+
       <div class="chart" style="margin:30px;" v-if="this.aptAddress != ''">
-        <line-chart
-          :height="250"
-          :chart-data="this.chartData"
-          :key="this.aptAddress"
-        >
-        </line-chart>
-        <!-- <bar-chart :height="250" :chart-data="this.chartData"> </bar-chart> -->
+        <div>
+          <bar-chart
+            :height="250"
+            :chart-data="this.chartData"
+            :key="this.aptAddress"
+          >
+          </bar-chart>
+          <!-- <line-chart
+            :height="250"
+            :key="this.aptAddress"
+            :chart-data="this.chartData"
+          >
+          </line-chart> -->
+        </div>
       </div>
     </div>
     <!-- <a href="#">About</a>
@@ -60,6 +68,11 @@ export default {
   },
   data() {
     return {
+      selected: "A",
+      options: [
+        { value: "A", text: "막대그래프" },
+        { value: "B", text: "곡선그래프" }
+      ],
       curPageNum: 1,
       aptName: "",
       chart: {
@@ -90,6 +103,10 @@ export default {
     ])
   },
   watch: {
+    selected(value) {
+      if (value == "A") {
+      }
+    },
     pageNum(value) {
       console.log(1);
       this.curPageNum = value;
