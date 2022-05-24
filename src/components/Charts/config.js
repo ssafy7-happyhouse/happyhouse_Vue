@@ -154,7 +154,7 @@ function chartOptions() {
     ticks: {
       padding: 20,
       autoSkip: true,
-      maxTicksLimit: 10
+      maxTicksLimit: 7
     },
     maxBarThickness: 10
   });

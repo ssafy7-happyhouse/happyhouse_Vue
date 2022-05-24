@@ -100,6 +100,8 @@
             </h5>
             <vue-slider
               v-model="value[0]"
+              :process="process"
+              :tooltip="'none'"
               :min="0"
               :max="300"
               :interval="50"
@@ -112,6 +114,8 @@
             </h5>
             <vue-slider
               v-model="value[1]"
+              :process="process"
+              :tooltip="'none'"
               :min="0"
               :max="30"
               :interval="5"
@@ -125,6 +129,8 @@
             </h5>
             <vue-slider
               v-model="value[2]"
+              :process="process"
+              :tooltip="'none'"
               :min="0"
               :max="21"
               :interval="3"
@@ -203,7 +209,10 @@ export default {
       ],
       marks_1: [0, 50, 100, 150, 200, 250, 300],
       marks_2: [0, 5, 10, 15, 20, 25, 30],
-      marks_3: [0, 3, 6, 9, 12, 15, 18, 21]
+      marks_3: [0, 3, 6, 9, 12, 15, 18, 21],
+      process: dotsPos => [
+        [dotsPos[0], dotsPos[1], { backgroundColor: "#5e72e4" }]
+      ]
     };
   },
   filters: {
