@@ -4,6 +4,7 @@
     <side-bar style="z-index:1090;">
       <template slot="links">
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'Home',
             path: '/home',
@@ -13,6 +14,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'Board',
             path: '/board',
@@ -22,6 +24,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'QnA',
             path: '/qna',
@@ -31,6 +34,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'News',
             path: '/news',
@@ -40,6 +44,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'User Profile',
             path: '/profile',
@@ -50,6 +55,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'Login',
             path: '/login',
@@ -71,6 +77,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'Register',
             path: '/register',
@@ -240,9 +247,12 @@ export default {
   },
   methods: {
     ...mapActions("mapStore", ["makeMarker", "markerClick"]),
-
+    closeFilterAndSideBar() {
+      document.getElementById("customSidebar").style.width = "0px";
+      document.getElementById("custom-filter").style.left = "-80%";
+    },
     filterClose() {
-      document.getElementById("custom-filter").style.left = "-40%";
+      document.getElementById("custom-filter").style.left = "-80%";
     },
     filterReset() {
       this.value = [
@@ -258,6 +268,7 @@ export default {
       }
     },
     logout() {
+      this.closeFilterAndSideBar();
       sessionStorage.clear();
       this.$router.push({ name: home });
     }

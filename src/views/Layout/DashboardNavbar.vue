@@ -238,5 +238,4 @@ window.onclick = e => {
     document.getElementById("myDropdown").classList.remove("show");
   }
 };
-
 </script>

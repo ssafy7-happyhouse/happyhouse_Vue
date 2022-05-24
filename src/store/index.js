@@ -13,7 +13,12 @@ const store = new Vuex.Store({
     userStore
   },
 
-  plugins: [createPersistedState]
+  plugins: [
+    createPersistedState({
+      //주목! : 여기에 쓴 모듈만 저장됩니다.
+      paths: ["userStore"]
+    })
+  ]
 });
 
 export default store;
