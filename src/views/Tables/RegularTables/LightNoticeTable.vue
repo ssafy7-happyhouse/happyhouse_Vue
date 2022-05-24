@@ -1,7 +1,7 @@
 <template>
   <b-card no-body>
     <b-card-header class="border-0">
-      <h3 class="mb-0">Light table</h3>
+      <h3 class="mb-0">공지사항</h3>
     </b-card-header>
 
     <el-table

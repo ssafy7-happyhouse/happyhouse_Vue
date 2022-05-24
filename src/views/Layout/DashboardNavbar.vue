@@ -199,9 +199,9 @@ export default {
   }
 };
 
-window.onclick = e => {
-  if (e.target.class != "myDropdown") {
-    document.getElementById("myDropdown").classList.remove("show");
-  }
-};
+// window.onclick = e => {
+//   if (e.target.class != "myDropdown") {
+//     document.getElementById("myDropdown").classList.remove("show");
+//   }
+// };
 </script>

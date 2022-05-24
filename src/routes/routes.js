@@ -22,13 +22,70 @@ const routes = [
         path: "/board",
         name: "board",
         component: () =>
-          import(/* webpackChunkName: "demo" */ "../views/RegularTables.vue")
+          import(
+            /* webpackChunkName: "demo" */ "../views/RegularNoticeTables.vue"
+          )
       },
       {
         path: "/qna",
         name: "qna",
         component: () =>
-          import(/* webpackChunkName: "demo" */ "../views/RegularTables.vue")
+          import(/* webpackChunkName: "demo" */ "@/views/RegularQnaTables.vue"),
+        redirect: "/qna/list",
+        children: [
+          {
+            path: "list",
+            name: "qnaList",
+            component: () =>
+              import(
+                /* webpackChunkName: "demo" */ "@/views/Tables/RegularTables/LightQnaTable.vue"
+              )
+          },
+          {
+            path: "boardDetail",
+            name: "boardDetail",
+            // route level code-splitting
+            // this generates a separate chunk (about.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () =>
+              import(
+                /* webpackChunkName: "demo" */ "@/views/Pages/Board/QnaDetail.vue"
+              )
+          },
+          {
+            path: "boardDelete",
+            name: "boardDelete",
+            // route level code-splitting
+            // this generates a separate chunk (about.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () =>
+              import(
+                /* webpackChunkName: "demo" */ "@/views/Pages/Board/QnaDelete.vue"
+              )
+          },
+          {
+            path: "boardModify",
+            name: "boardModify",
+            // route level code-splitting
+            // this generates a separate chunk (about.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () =>
+              import(
+                /* webpackChunkName: "demo" */ "@/views/Pages/Board/QnaModify.vue"
+              )
+          },
+          {
+            path: "boardRegister",
+            name: "boardRegister",
+            // route level code-splitting
+            // this generates a separate chunk (about.[hash].js) for this route
+            // which is lazy-loaded when the route is visited.
+            component: () =>
+              import(
+                /* webpackChunkName: "demo" */ "@/views/Pages/Board/QnaRegister.vue"
+              )
+          }
+        ]
       },
       {
         path: "/news",
