@@ -120,13 +120,14 @@ export default {
     ...mapState(userStore, ["userInfo"])
   },
   methods: {
-    ...mapMutations(userStore, ["SET_USER_INFO"]),
+    ...mapMutations(userStore, ["SET_IS_LOGIN", "SET_USER_INFO"]),
     logout() {
       if (sessionStorage.getItem("refresh-token")) {
         Kakao.Auth.logout(function() {});
       }
       sessionStorage.clear();
       this.SET_USER_INFO(null);
+      this.SET_IS_LOGIN(false);
       this.$router.push({ name: "home" });
     }
   },
