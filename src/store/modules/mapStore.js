@@ -3,7 +3,8 @@ import { aptList } from "@/api/apartment";
 import {
   aptDetailListByaptCode,
   aptListByDongCode,
-  aptDetailListByAptCodeAndAptName
+  aptDetailListByAptCodeAndAptName,
+  aptDealByAptCode
 } from "../../api/apartment";
 import imageSrc from "@/assets/marker.png";
 
@@ -20,7 +21,8 @@ const mapStore = {
     currentDongCode: "",
     pageNum: 1,
     pageSize: 6,
-    pages: 76
+    pages: 76,
+    chartData: { labels: [], datasets: [{ data: [], label: "거래가격" }] }
   },
 
   getters: {
@@ -50,6 +52,9 @@ const mapStore = {
     },
     aptList(state) {
       return state.aptList;
+    },
+    chartData(state) {
+      return state.chartData;
     },
     currentDongCode(state) {
       return state.currentDongCode;
@@ -127,6 +132,16 @@ const mapStore = {
         });
       });
       state.aptList = aptList;
+    },
+    SET_CHARTDATADATE: (state, dealDate) => {
+      state.chartData.labels.push(dealDate);
+    },
+    SET_CHARTDATAAMOUNT: (state, dealAmount) => {
+      state.chartData.datasets[0].data.push(dealAmount);
+    },
+    REMOVE_CHARTDATA: state => {
+      state.chartData.labels.length = 0;
+      state.chartData.datasets[0].data.length = 0;
     },
     SET_MAPLEVEL: state => {
       state.map.setLevel(2);
@@ -446,6 +461,7 @@ const mapStore = {
               let pageNum = 1;
               let pageSize = 6;
               dispatch("getAptDetail", { aptCode, pageNum, pageSize });
+              dispatch("getAptDealByAptCode", { aptCode });
               commit("SET_MAPLEVEL");
               map.panTo(latlng);
             };
@@ -499,12 +515,27 @@ const mapStore = {
         }
       );
     },
-    markerClick({ commit, dispatch, getters }, { aptCode, latlng }) {
-      let pageNum = 1;
-      let pageSize = 6;
-      dispatch("getAptDetail", { aptCode, pageNum, pageSize });
-      commit("SET_MAPLEVEL");
-      getters.map.panTo(latlng);
+
+    getAptDealByAptCode({ commit }, { aptCode }) {
+      commit("REMOVE_CHARTDATA");
+
+      aptDealByAptCode(
+        { aptCode },
+        response => {
+          response.data.forEach(element => {
+            let date = element.dealYear + "/" + element.dealMonth;
+            let dealAmount = element.dealAmount;
+            commit("SET_CHARTDATADATE", date);
+            commit(
+              "SET_CHARTDATAAMOUNT",
+              Math.round(Number(dealAmount) / 100) / 100
+            );
+            // dealAmounts.push(element.dealAmount);
+            // dealDates.push(element.Year + "/" + element.dealMonth);
+          });
+        },
+        error => {}
+      );
     },
     getMap({ dispatch }) {
       let minAmount = 0;

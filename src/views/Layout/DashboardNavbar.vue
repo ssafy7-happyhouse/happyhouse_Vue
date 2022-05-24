@@ -150,7 +150,11 @@ export default {
     };
   },
   methods: {
-    ...mapActions("mapStore", ["getAptDetail", "getAptListByDongCode"]),
+    ...mapActions("mapStore", [
+      "getAptDetail",
+      "getAptListByDongCode",
+      "getAptDealByAptCode"
+    ]),
     filterClick() {
       if (document.getElementById("custom-filter").style.left == "50px") {
         document.getElementById("custom-filter").style.left = "-80%";
@@ -180,10 +184,11 @@ export default {
         error => {}
       );
     },
-    moveApt(aptCode, lat, lng, event) {
+    moveApt(aptCode, lat, lng) {
       document.getElementById("myDropdown").classList.remove("show");
       document.getElementById("customSidebar").style.width = "500px";
 
+      this.getAptDealByAptCode({ aptCode });
       let pageNum = 1;
       let pageSize = 6;
       this.getAptDetail({ aptCode, pageNum, pageSize });
@@ -225,7 +230,11 @@ export default {
 };
 
 window.onclick = e => {
-  if (e.target.class != "myDropdown") {
+  if (
+    e.target.className != "fas fa-search" &&
+    e.target.className != "input-group-text" &&
+    e.target.className != "form-control"
+  ) {
     document.getElementById("myDropdown").classList.remove("show");
   }
 };

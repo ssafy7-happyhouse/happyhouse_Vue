@@ -29,8 +29,8 @@
           ></b-pagination>
         </div>
       </b-jumbotron>
-      <div class="chart" style="margin:30px;">
-        <line-chart :height="250" :chart-data="chart.chartData"> </line-chart>
+      <div class="chart" style="margin:30px;" v-if="this.aptAddress != ''">
+        <line-chart :height="250" :chart-data="this.chartData"> </line-chart>
       </div>
     </div>
     <!-- <a href="#">About</a>
@@ -59,11 +59,11 @@ export default {
         chartData: {
           datasets: [
             {
-              label: "Performance",
-              data: [0, 20, 100, 30, 15, 40, 20, 60, 60]
+              label: "평균거래가격",
+              data: []
             }
           ],
-          labels: ["May", "Jun", "Jul", "Aug", "Sep"]
+          labels: []
         }
         // extraOptions: chartConfigs.blueChartOptions
       }
@@ -77,7 +77,8 @@ export default {
       "currentDongCode",
       "pageNum",
       "pageSize",
-      "pages"
+      "pages",
+      "chartData"
     ])
   },
   watch: {
