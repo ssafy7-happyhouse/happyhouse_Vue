@@ -395,8 +395,6 @@ const mapStore = {
         },
         response => {
           let positions = [];
-          console.log(response.data);
-
           response.data.forEach(element => {
             positions.push({
               aptCode: element.aptCode,

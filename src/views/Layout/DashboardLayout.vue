@@ -95,11 +95,11 @@
         >
           <div class="mb-5">
             <h5>
-              전용면적 : {{ value_1[0] }} m<sup>2</sup> 이상 ~
-              {{ value_1[1] }} m<sup>2</sup> 미만
+              전용면적 : {{ value[0][0] }} m<sup>2</sup> 이상 ~
+              {{ value[0][1] }} m<sup>2</sup> 미만
             </h5>
             <vue-slider
-              v-model="value_1"
+              v-model="value[0]"
               :min="0"
               :max="300"
               :interval="50"
@@ -108,10 +108,10 @@
           </div>
           <div class="mb-5">
             <h5>
-              거래가격 : {{ value_2[0] }} 억 이상 ~ {{ value_2[1] }} 억 미만
+              거래가격 : {{ value[1][0] }} 억 이상 ~ {{ value[1][1] }} 억 미만
             </h5>
             <vue-slider
-              v-model="value_2"
+              v-model="value[1]"
               :min="0"
               :max="30"
               :interval="5"
@@ -120,11 +120,11 @@
           </div>
           <div class="mb-5">
             <h5>
-              건축년도 : {{ value_3[0] | yearFormat }} 년 ~
-              {{ value_3[1] | yearFormat }} 년
+              건축년도 : {{ value[2][0] | yearFormat }} 년 ~
+              {{ value[2][1] | yearFormat }} 년
             </h5>
             <vue-slider
-              v-model="value_3"
+              v-model="value[2]"
               :min="0"
               :max="21"
               :interval="3"
@@ -196,9 +196,11 @@ export default {
   },
   data() {
     return {
-      value_1: [0, 300],
-      value_2: [0, 30],
-      value_3: [0, 21],
+      value: [
+        [0, 300],
+        [0, 30],
+        [0, 21]
+      ],
       marks_1: [0, 50, 100, 150, 200, 250, 300],
       marks_2: [0, 5, 10, 15, 20, 25, 30],
       marks_3: [0, 3, 6, 9, 12, 15, 18, 21]
@@ -210,64 +212,20 @@ export default {
     }
   },
   watch: {
-    value_1(val) {
+    value(val) {
       this.REMOVE_CLUSTERER;
       this.REMOVE_OVERLAYS;
       this.REMOVE_MARKERS;
-      let minAmount = this.value_2[0] * 10000;
-      let maxAmount = this.value_2[1] * 10000;
-      let minBuildYear = this.value_3[0] + 2000;
-      let maxBuildYear = this.value_3[1] + 2000;
 
       this.makeMarker({
         clusterer: this.clusterer,
         map: this.map,
-        minAmount: minAmount,
-        maxAmount: maxAmount,
-        minArea: val[0],
-        maxArea: val[1],
-        minBuildYear: minBuildYear,
-        maxBuildYear: maxBuildYear
-      });
-    },
-    value_2(val) {
-      this.REMOVE_CLUSTERER;
-      this.REMOVE_OVERLAYS;
-      this.REMOVE_MARKERS;
-      let minArea = this.value_1[0];
-      let maxArea = this.value_1[1];
-      let minBuildYear = this.value_3[0] + 2000;
-      let maxBuildYear = this.value_3[1] + 2000;
-
-      this.makeMarker({
-        clusterer: this.clusterer,
-        map: this.map,
-        minAmount: val[0] * 10000,
-        maxAmount: val[1] * 10000,
-        minArea: minArea,
-        maxArea: maxArea,
-        minBuildYear: minBuildYear,
-        maxBuildYear: maxBuildYear
-      });
-    },
-    value_3(val) {
-      this.REMOVE_CLUSTERER;
-      this.REMOVE_OVERLAYS;
-      this.REMOVE_MARKERS;
-      let minArea = this.value_1[0];
-      let maxArea = this.value_1[1];
-      let minAmount = this.value_2[0] * 10000;
-      let maxAmount = this.value_2[1] * 10000;
-
-      this.makeMarker({
-        clusterer: this.clusterer,
-        map: this.map,
-        minAmount: minAmount,
-        maxAmount: maxAmount,
-        minArea: minArea,
-        maxArea: maxArea,
-        minBuildYear: val[0] + 2000,
-        maxBuildYear: val[1] + 2000
+        minArea: val[0][0],
+        maxArea: val[0][1],
+        minAmount: val[1][0] * 10000,
+        maxAmount: val[1][1] * 10000,
+        minBuildYear: val[2][0] + 2000,
+        maxBuildYear: val[2][1] + 2000
       });
     }
   },
@@ -277,22 +235,11 @@ export default {
       document.getElementById("custom-filter").style.left = "-40%";
     },
     filterReset() {
-      this.REMOVE_CLUSTERER;
-      this.REMOVE_OVERLAYS;
-      this.REMOVE_MARKERS;
-      this.value_1 = [0, 300];
-      this.value_2 = [0, 30];
-      this.value_3 = [0, 21];
-      this.makeMarker({
-        clusterer: this.clusterer,
-        map: this.map,
-        minAmount: 0,
-        maxAmount: 300000,
-        minArea: 0,
-        maxArea: 300,
-        minBuildYear: 2000,
-        maxBuildYear: 2022
-      });
+      this.value = [
+        [0, 300],
+        [0, 30],
+        [0, 21]
+      ];
     },
     initScrollbar() {
       let isWindows = navigator.platform.startsWith("Win");
@@ -319,9 +266,6 @@ export default {
     ...mapState(userStore, ["userInfo"]),
     ...mapState("mapStore", ["map", "clusterer"])
   }
-  // created() {
-  //   console.log(userInfo);
-  // }
 };
 </script>
 <style>
