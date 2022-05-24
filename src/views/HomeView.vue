@@ -1,6 +1,6 @@
 <template>
   <div>
-    <base-header class="pb-6 pb-8 pt-5 pt-md-8 bg-gradient-success">
+    <base-header class="pb-6 pb-8 pt-5 pt-md-8 bg-gradient-primary">
     </base-header>
 
     <b-container fluid class="mt--7">
@@ -47,6 +47,9 @@
   </div>
 </template>
 <script>
+function markerClick() {
+  this.markerClick(aptCode, latlng);
+}
 import { mapActions, mapState } from "vuex";
 
 export default {

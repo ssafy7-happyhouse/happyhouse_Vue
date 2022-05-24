@@ -45,10 +45,17 @@ function aptDetailListByAptCodeAndAptName(params, page, success, fail) {
     .catch(fail);
 }
 
+function aptDealByAptCode(params, success, fail) {
+  api
+    .get(`/apartment/deal/chart/${params.aptCode}`)
+    .then(success)
+    .catch(fail);
+}
 export {
   aptList,
   aptListByName,
   aptDetailListByaptCode,
   aptListByDongCode,
-  aptDetailListByAptCodeAndAptName
+  aptDetailListByAptCodeAndAptName,
+  aptDealByAptCode
 };

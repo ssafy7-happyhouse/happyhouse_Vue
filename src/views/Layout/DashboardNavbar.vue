@@ -150,7 +150,11 @@ export default {
     };
   },
   methods: {
-    ...mapActions("mapStore", ["getAptDetail", "getAptListByDongCode"]),
+    ...mapActions("mapStore", [
+      "getAptDetail",
+      "getAptListByDongCode",
+      "getAptDealByAptCode"
+    ]),
     filterClick() {
       if (document.getElementById("custom-filter").style.left == "50px") {
         document.getElementById("custom-filter").style.left = "-80%";
@@ -180,10 +184,11 @@ export default {
         error => {}
       );
     },
-    moveApt(aptCode, lat, lng, event) {
+    moveApt(aptCode, lat, lng) {
       document.getElementById("myDropdown").classList.remove("show");
       document.getElementById("customSidebar").style.width = "500px";
 
+      this.getAptDealByAptCode({ aptCode });
       let pageNum = 1;
       let pageSize = 6;
       this.getAptDetail({ aptCode, pageNum, pageSize });
@@ -197,7 +202,6 @@ export default {
       let pageNum = 1;
       let pageSize = 6;
       this.getAptListByDongCode({ dongCode, pageNum, pageSize });
-
       // 주소로 좌표를 검색합니다
       const map = this.map;
       geocoder.addressSearch(gugunName + " " + dongName, function(
@@ -225,9 +229,14 @@ export default {
   }
 };
 
-// window.onclick = e => {
-//   if (e.target.class != "myDropdown") {
-//     document.getElementById("myDropdown").classList.remove("show");
-//   }
-// };
+window.onclick = e => {
+  if (
+    e.target.className != "fas fa-search" &&
+    e.target.className != "input-group-text" &&
+    e.target.className != "form-control"
+  ) {
+    document.getElementById("myDropdown").classList.remove("show");
+  }
+};
+
 </script>

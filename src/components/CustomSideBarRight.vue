@@ -29,8 +29,22 @@
           ></b-pagination>
         </div>
       </b-jumbotron>
-      <div class="chart" style="margin:30px;">
-        <line-chart :height="250" :chart-data="chart.chartData"> </line-chart>
+
+      <div class="chart" style="margin:30px;" v-if="this.aptAddress != ''">
+        <div>
+          <bar-chart
+            :height="250"
+            :chart-data="this.chartData"
+            :key="this.aptAddress"
+          >
+          </bar-chart>
+          <!-- <line-chart
+            :height="250"
+            :key="this.aptAddress"
+            :chart-data="this.chartData"
+          >
+          </line-chart> -->
+        </div>
       </div>
     </div>
     <!-- <a href="#">About</a>
@@ -42,17 +56,23 @@
 <script>
 import NavbarToggleButton from "@/components/NavbarToggleButton";
 import LineChart from "@/components/Charts/LineChart";
+import BarChart from "@/components/Charts/BarChart";
 import { mapGetters, mapActions } from "vuex";
-import { aptDetailListByAptCodeAndAptName } from "@/api/apartment";
 
 export default {
   name: "sidebar",
   components: {
     NavbarToggleButton,
-    LineChart
+    LineChart,
+    BarChart
   },
   data() {
     return {
+      selected: "A",
+      options: [
+        { value: "A", text: "막대그래프" },
+        { value: "B", text: "곡선그래프" }
+      ],
       curPageNum: 1,
       aptName: "",
       chart: {
@@ -60,11 +80,11 @@ export default {
         chartData: {
           datasets: [
             {
-              label: "Performance",
-              data: [0, 20, 10, 30, 15, 40, 20, 60, 60]
+              label: "평균거래가격",
+              data: []
             }
           ],
-          labels: ["May", "Jun", "Jul", "Aug", "Sep"]
+          labels: []
         }
         // extraOptions: chartConfigs.blueChartOptions
       }
@@ -78,11 +98,17 @@ export default {
       "currentDongCode",
       "pageNum",
       "pageSize",
-      "pages"
+      "pages",
+      "chartData"
     ])
   },
   watch: {
+    selected(value) {
+      if (value == "A") {
+      }
+    },
     pageNum(value) {
+      console.log(1);
       this.curPageNum = value;
     }
   },
