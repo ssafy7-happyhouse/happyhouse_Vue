@@ -30,7 +30,13 @@
         </div>
       </b-jumbotron>
       <div class="chart" style="margin:30px;" v-if="this.aptAddress != ''">
-        <line-chart :height="250" :chart-data="this.chartData"> </line-chart>
+        <line-chart
+          :height="250"
+          :chart-data="this.chartData"
+          :key="this.aptAddress"
+        >
+        </line-chart>
+        <!-- <bar-chart :height="250" :chart-data="this.chartData"> </bar-chart> -->
       </div>
     </div>
     <!-- <a href="#">About</a>
@@ -42,13 +48,15 @@
 <script>
 import NavbarToggleButton from "@/components/NavbarToggleButton";
 import LineChart from "@/components/Charts/LineChart";
+import BarChart from "@/components/Charts/BarChart";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "sidebar",
   components: {
     NavbarToggleButton,
-    LineChart
+    LineChart,
+    BarChart
   },
   data() {
     return {
@@ -83,6 +91,7 @@ export default {
   },
   watch: {
     pageNum(value) {
+      console.log(1);
       this.curPageNum = value;
     }
   },

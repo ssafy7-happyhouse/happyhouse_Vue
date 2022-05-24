@@ -530,12 +530,11 @@ const mapStore = {
               "SET_CHARTDATAAMOUNT",
               Math.round(Number(dealAmount) / 100) / 100
             );
-            // dealAmounts.push(element.dealAmount);
-            // dealDates.push(element.Year + "/" + element.dealMonth);
           });
         },
         error => {}
       );
+      vm.$forceUpdate();
     },
     getMap({ dispatch }) {
       let minAmount = 0;
