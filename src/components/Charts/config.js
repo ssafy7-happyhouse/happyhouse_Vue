@@ -152,7 +152,9 @@ function chartOptions() {
       zeroLineWidth: 1
     },
     ticks: {
-      padding: 20
+      padding: 20,
+      autoSkip: true,
+      maxTicksLimit: 10
     },
     maxBarThickness: 10
   });
