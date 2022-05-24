@@ -230,7 +230,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions("mapStore", ["makeMarker"]),
+    ...mapActions("mapStore", ["makeMarker", "markerClick"]),
+
     filterClose() {
       document.getElementById("custom-filter").style.left = "-40%";
     },
@@ -272,9 +273,8 @@ export default {
 .custom-marker {
   font-size: x-small;
   position: relative;
-  bottom: 10px;
-}
-.marker-image {
-  height: 40px;
+  bottom: 20px;
+  color: white;
+  cursor: pointer;
 }
 </style>

@@ -43,7 +43,6 @@
 import NavbarToggleButton from "@/components/NavbarToggleButton";
 import LineChart from "@/components/Charts/LineChart";
 import { mapGetters, mapActions } from "vuex";
-import { aptDetailListByAptCodeAndAptName } from "@/api/apartment";
 
 export default {
   name: "sidebar",
@@ -61,7 +60,7 @@ export default {
           datasets: [
             {
               label: "Performance",
-              data: [0, 20, 10, 30, 15, 40, 20, 60, 60]
+              data: [0, 20, 100, 30, 15, 40, 20, 60, 60]
             }
           ],
           labels: ["May", "Jun", "Jul", "Aug", "Sep"]

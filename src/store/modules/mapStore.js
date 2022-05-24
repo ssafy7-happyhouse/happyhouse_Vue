@@ -108,7 +108,7 @@ const mapStore = {
         aptList.push({
           계약년월: element.dealYear + "/" + element.dealMonth,
           가격: Math.round(element.dealAmount / 100) / 100 + "억",
-          면적: element.area + "m²",
+          면적: Math.round(element.area / 3.3058) + "평",
           층:
             (element.floor < 0
               ? "지하 " + Math.abs(element.floor)
@@ -400,7 +400,8 @@ const mapStore = {
               aptCode: element.aptCode,
               title: element.aptName,
               latlng: new kakao.maps.LatLng(element.lat, element.lng),
-              avgAmount: element.avgAmount
+              lastAmount: element.lastAmount,
+              area: element.area
             });
           });
 
@@ -409,9 +410,11 @@ const mapStore = {
               let sum = 0;
               eleCluster._markers.forEach(marker => {
                 if (marker.cc) {
-                  let startIndex = marker.cc.indexOf(">");
-                  let endIndex = marker.cc.indexOf("억");
-                  sum += Number(marker.cc.substring(startIndex + 1, endIndex));
+                  let startIndex = marker.cc.innerText.indexOf("평");
+                  let endIndex = marker.cc.innerText.indexOf("억");
+                  sum += Number(
+                    marker.cc.innerText.substring(startIndex + 1, endIndex)
+                  );
                 }
               });
               eleCluster._content.innerHTML =
@@ -423,7 +426,7 @@ const mapStore = {
 
           for (let i = 0; i < positions.length; i++) {
             // 마커 이미지의 이미지 크기 입니다
-            let imageSize = new kakao.maps.Size(55, 45);
+            let imageSize = new kakao.maps.Size(55, 55);
 
             // 마커 이미지를 생성합니다
             let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
@@ -439,18 +442,33 @@ const mapStore = {
             let aptCode = positions[i].aptCode;
             let latlng = positions[i].latlng;
 
-            kakao.maps.event.addListener(marker, "click", function() {
+            let markerClick = function() {
               let pageNum = 1;
               let pageSize = 6;
               dispatch("getAptDetail", { aptCode, pageNum, pageSize });
               commit("SET_MAPLEVEL");
               map.panTo(latlng);
-            });
+            };
 
-            var content =
-              "<div class=custom-marker style='color:white'>" +
-              +Math.round(positions[i].avgAmount / 100) / 100 +
-              "억</div>";
+            kakao.maps.event.addListener(marker, "click", markerClick);
+            let content = document.createElement("div");
+            let areaContent = document.createElement("p");
+            let amountContent = document.createElement("p");
+
+            let areaText = document.createTextNode(
+              Math.round(positions[i].area / 3.3058) + "평"
+            );
+            let amountText = document.createTextNode(
+              Math.round(Math.round(positions[i].lastAmount / 100) / 100) + "억"
+            );
+            areaContent.appendChild(areaText);
+            amountContent.appendChild(amountText);
+
+            content.appendChild(areaContent);
+            content.appendChild(amountContent);
+            content.className = "custom-marker";
+
+            content.addEventListener("click", markerClick);
 
             var overlay = new kakao.maps.CustomOverlay({
               content: content,
@@ -480,6 +498,13 @@ const mapStore = {
           }
         }
       );
+    },
+    markerClick({ commit, dispatch, getters }, { aptCode, latlng }) {
+      let pageNum = 1;
+      let pageSize = 6;
+      dispatch("getAptDetail", { aptCode, pageNum, pageSize });
+      commit("SET_MAPLEVEL");
+      getters.map.panTo(latlng);
     },
     getMap({ dispatch }) {
       let minAmount = 0;

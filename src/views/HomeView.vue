@@ -47,6 +47,9 @@
   </div>
 </template>
 <script>
+function markerClick() {
+  this.markerClick(aptCode, latlng);
+}
 import { mapActions, mapState } from "vuex";
 
 export default {
