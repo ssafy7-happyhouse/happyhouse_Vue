@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <notifications></notifications>
-    <side-bar>
+    <side-bar style="z-index:1090;">
       <template slot="links">
         <sidebar-item
           :link="{
@@ -79,32 +79,6 @@
         >
         </sidebar-item>
       </template>
-
-      <!-- <template slot="links-after">
-        <hr class="my-3" />
-        <h6 class="navbar-heading p-0 text-muted">Documentation</h6>
-
-        <b-nav class="navbar-nav mb-md-3">
-          <b-nav-item
-            href="https://www.creative-tim.com/learning-lab/bootstrap-vue/quick-start/argon-dashboard"
-          >
-            <i class="ni ni-spaceship"></i>
-            <b-nav-text class="p-0">Getting started</b-nav-text>
-          </b-nav-item>
-          <b-nav-item
-            href="https://www.creative-tim.com/learning-lab/bootstrap-vue/colors/argon-dashboard"
-          >
-            <i class="ni ni-palette"></i>
-            <b-nav-text class="p-0">Foundation</b-nav-text>
-          </b-nav-item>
-          <b-nav-item
-            href="https://www.creative-tim.com/learning-lab/bootstrap-vue/avatar/argon-dashboard"
-          >
-            <i class="ni ni-ui-04"></i>
-            <b-nav-text class="p-0">Components</b-nav-text>
-          </b-nav-item>
-        </b-nav>
-      </template> -->
     </side-bar>
     <div class="main-content">
       <dashboard-navbar :type="$route.meta.navbarType"></dashboard-navbar>
@@ -114,6 +88,64 @@
           <!-- your content here -->
           <router-view></router-view>
         </fade-transition>
+        <div
+          id="custom-filter"
+          style="height:400px; width:300px; background-color: white; position: absolute;  transition: 0.5s; 
+ left:-80%; top:20%; padding:30px; border-radius: 10px;"
+        >
+          <div class="mb-5">
+            <h5>
+              전용면적 : {{ value[0][0] }} m<sup>2</sup> 이상 ~
+              {{ value[0][1] }} m<sup>2</sup> 미만
+            </h5>
+            <vue-slider
+              v-model="value[0]"
+              :min="0"
+              :max="300"
+              :interval="50"
+              :marks="marks_1"
+            ></vue-slider>
+          </div>
+          <div class="mb-5">
+            <h5>
+              거래가격 : {{ value[1][0] }} 억 이상 ~ {{ value[1][1] }} 억 미만
+            </h5>
+            <vue-slider
+              v-model="value[1]"
+              :min="0"
+              :max="30"
+              :interval="5"
+              :marks="marks_2"
+            ></vue-slider>
+          </div>
+          <div class="mb-5">
+            <h5>
+              건축년도 : {{ value[2][0] | yearFormat }} 년 ~
+              {{ value[2][1] | yearFormat }} 년
+            </h5>
+            <vue-slider
+              v-model="value[2]"
+              :min="0"
+              :max="21"
+              :interval="3"
+              :marks="marks_3"
+            ></vue-slider>
+          </div>
+          <div>
+            <base-button
+              type="secondary"
+              style="margin-left: 10px;"
+              @click="filterReset"
+              >초기화</base-button
+            >
+            <base-button
+              type="secondary"
+              style="margin-left: 10px;"
+              @click="filterClose"
+              >닫기</base-button
+            >
+          </div>
+        </div>
         <custom-side-bar-right></custom-side-bar-right>
       </div>
       <content-footer v-if="!$route.meta.hideFooter"></content-footer>
@@ -124,6 +156,7 @@
 /* eslint-disable no-new */
 import PerfectScrollbar from "perfect-scrollbar";
 import "perfect-scrollbar/css/perfect-scrollbar.css";
+import "vue-slider-component/theme/default.css";
 
 function hasElement(className) {
   return document.getElementsByClassName(className).length > 0;
@@ -144,9 +177,10 @@ import DashboardNavbar from "./DashboardNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import { FadeTransition } from "vue2-transitions";
-import { mapState } from "vuex";
+import { mapMutations, mapState, mapActions } from "vuex";
 import SideBar from "../../components/SidebarPlugin/SideBar.vue";
 import { CustomSideBarRight } from "@/components";
+import VueSlider from "vue-slider-component";
 
 const userStore = "userStore";
 
@@ -157,9 +191,56 @@ export default {
     DashboardContent,
     FadeTransition,
     CustomSideBarRight,
-    SideBar
+    SideBar,
+    VueSlider
+  },
+  data() {
+    return {
+      value: [
+        [0, 300],
+        [0, 30],
+        [0, 21]
+      ],
+      marks_1: [0, 50, 100, 150, 200, 250, 300],
+      marks_2: [0, 5, 10, 15, 20, 25, 30],
+      marks_3: [0, 3, 6, 9, 12, 15, 18, 21]
+    };
+  },
+  filters: {
+    yearFormat(value) {
+      return "20" + (value < 10 ? "0" + value : value);
+    }
+  },
+  watch: {
+    value(val) {
+      this.REMOVE_CLUSTERER;
+      this.REMOVE_OVERLAYS;
+      this.REMOVE_MARKERS;
+
+      this.makeMarker({
+        clusterer: this.clusterer,
+        map: this.map,
+        minArea: val[0][0],
+        maxArea: val[0][1],
+        minAmount: val[1][0] * 10000,
+        maxAmount: val[1][1] * 10000,
+        minBuildYear: val[2][0] + 2000,
+        maxBuildYear: val[2][1] + 2000
+      });
+    }
   },
   methods: {
+    ...mapActions("mapStore", ["makeMarker"]),
+    filterClose() {
+      document.getElementById("custom-filter").style.left = "-40%";
+    },
+    filterReset() {
+      this.value = [
+        [0, 300],
+        [0, 30],
+        [0, 21]
+      ];
+    },
     initScrollbar() {
       let isWindows = navigator.platform.startsWith("Win");
       if (isWindows) {
@@ -176,11 +257,24 @@ export default {
     // console.log(userInfo);
   },
   computed: {
-    ...mapState(userStore, ["userInfo"])
+    ...mapMutations("mapStore", [
+      "REMOVE_MARKERS",
+      "REMOVE_OVERLAYS",
+      "REMOVE_CLUSTERER"
+    ]),
+
+    ...mapState(userStore, ["userInfo"]),
+    ...mapState("mapStore", ["map", "clusterer"])
   }
-  // created() {
-  //   console.log(userInfo);
-  // }
 };
 </script>
-<style lang="scss"></style>
+<style>
+.custom-marker {
+  font-size: x-small;
+  position: relative;
+  bottom: 10px;
+}
+.marker-image {
+  height: 40px;
+}
+</style>

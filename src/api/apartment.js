@@ -2,9 +2,11 @@ import { apiInstance } from "./index.js";
 
 const api = apiInstance();
 
-function aptList(success, fail) {
+function aptList(params, success, fail) {
   api
-    .get(`/apartment`)
+    .get(
+      `/apartment?minAmount=${params.minAmount}&maxAmount=${params.maxAmount}&minArea=${params.minArea}&maxArea=${params.maxArea}&minBuildYear=${params.minBuildYear}&maxBuildYear=${params.maxBuildYear}`
+    )
     .then(success)
     .catch(fail);
 }

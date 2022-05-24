@@ -34,11 +34,13 @@
     "sweetalert2": "^9.5.4",
     "vee-validate": "^3.2.1",
     "vue": "^2.6.11",
+    "vue-bootstrap-slider": "^2.1.8",
     "vue-chartjs": "^3.5.0",
     "vue-clipboard2": "^0.3.0",
     "vue-cookies": "^1.8.1",
     "vue-flatpickr-component": "^8.1.2",
     "vue-router": "^3.0.6",
+    "vue-slider-component": "^3.2.15",
     "vue2-transitions": "^0.2.3",
     "vuex": "^3.6.2",
     "vuex-persistedstate": "^4.1.0"
