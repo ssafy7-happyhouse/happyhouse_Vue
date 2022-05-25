@@ -369,7 +369,7 @@ const mapStore = {
       var clusterer = new kakao.maps.MarkerClusterer({
         map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
         averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
-        minLevel: 4, // 클러스터 할 최소 지도 레벨
+        minLevel: 3, // 클러스터 할 최소 지도 레벨
         texts: count => count / 2,
         minClusterSize: 3
       });
@@ -590,7 +590,9 @@ const mapStore = {
           commit("SET_CURRENTDONGCODE", response.data.list[0].dongCode);
           commit(
             "SET_APTADDRESS",
-            response.data.list[0].gugunName +
+            response.data.list[0].sidoName +
+              " " +
+              response.data.list[0].gugunName +
               " " +
               response.data.list[0].dongName +
               " " +
@@ -612,7 +614,9 @@ const mapStore = {
         response => {
           commit(
             "SET_TITLE",
-            response.data.list[0].gugunName +
+            response.data.list[0].sidoName +
+              " " +
+              response.data.list[0].gugunName +
               " " +
               response.data.list[0].dongName
           );
@@ -648,7 +652,9 @@ const mapStore = {
           commit("SET_TITLE", response.data.list[0].aptName);
           commit(
             "SET_APTADDRESS",
-            response.data.list[0].gugunName +
+            response.data.list[0].sidoName +
+              " " +
+              response.data.list[0].gugunName +
               " " +
               response.data.list[0].dongName +
               " " +
