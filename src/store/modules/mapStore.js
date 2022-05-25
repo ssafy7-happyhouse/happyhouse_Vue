@@ -4,7 +4,9 @@ import {
   aptDetailListByaptCode,
   aptListByDongCode,
   aptDetailListByAptCodeAndAptName,
-  aptDealByAptCode
+  aptDealByAptCode,
+  aptListByDong,
+  aptListByGugun
 } from "../../api/apartment";
 import imageSrc from "@/assets/marker.png";
 
@@ -22,10 +24,28 @@ const mapStore = {
     pageNum: 1,
     pageSize: 6,
     pages: 76,
+    minArea: 0,
+    maxArea: 100,
+    minAmount: 10000,
+    maxAmount: 300000,
+    minBuildYear: 2000,
+    maxBuildYear: 2022,
+    filterValue: [
+      [0, 100],
+      [0, 30],
+      [0, 21]
+    ],
+    level: 5,
     chartData: { labels: [], datasets: [{ data: [], label: "거래가격" }] }
   },
 
   getters: {
+    level(state) {
+      return state.level;
+    },
+    filterValue(state) {
+      return state.filterValue;
+    },
     map(state) {
       return state.map;
     },
@@ -62,6 +82,12 @@ const mapStore = {
   },
 
   mutations: {
+    SET_LEVEL: (state, level) => {
+      state.level = level;
+    },
+    SET_FILTERVALUE: (state, filterValue) => {
+      state.filterValue = filterValue;
+    },
     SET_CURRENTDONGCODE: (state, currentDongCode) => {
       state.currentDongCode = currentDongCode;
     },
@@ -144,7 +170,7 @@ const mapStore = {
       state.chartData.datasets[0].data.length = 0;
     },
     SET_MAPLEVEL: state => {
-      state.map.setLevel(2);
+      // state.map.setLevel(2);
     }
   },
 
@@ -362,19 +388,17 @@ const mapStore = {
     ) {
       const container = document.querySelector("#map-custom");
       const options = {
-        center: new kakao.maps.LatLng(35.19656853772262, 129.0807270648317),
-        level: 4
+        center: new kakao.maps.LatLng(37.541, 126.986),
+        level: 5
       };
       let map = new kakao.maps.Map(container, options);
-      var clusterer = new kakao.maps.MarkerClusterer({
-        map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
-        averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
-        minLevel: 4, // 클러스터 할 최소 지도 레벨
-        texts: count => count / 2,
-        minClusterSize: 3
+      // 지도가 확대 또는 축소되면 마지막 파라미터로 넘어온 함수를 호출하도록 이벤트를 등록합니다
+      kakao.maps.event.addListener(map, "zoom_changed", function() {
+        // 지도의 현재 레벨을 얻어옵니다
+        var level = map.getLevel();
+        dispatch("changeZoom", { level, map });
       });
       dispatch("makeMarker", {
-        clusterer,
         map,
         minAmount,
         maxAmount,
@@ -383,13 +407,96 @@ const mapStore = {
         minBuildYear,
         maxBuildYear
       });
-      commit("SET_CLUSTERER", clusterer);
       commit("SET_MAP", map);
     },
+    changeZoom({ commit, dispatch, getters }, { level, map }) {
+      let value = getters.filterValue;
+      if (level == 3) {
+        commit("REMOVE_OVERLAYS");
+        commit("REMOVE_MARKERS");
+        aptList(
+          {
+            minArea: Math.round(value[0][0] * 3.305),
+            maxArea: Math.round(value[0][1] * 3.305),
+            minAmount: value[1][0] * 10000,
+            maxAmount: value[1][1] * 10000,
+            minBuildYear: value[2][0] + 2000,
+            maxBuildYear: value[2][1] + 2000
+          },
+          response => {
+            let positions = [];
+            response.data.forEach(element => {
+              positions.push({
+                aptCode: element.aptCode,
+                title: element.aptName,
+                latlng: new kakao.maps.LatLng(element.lat, element.lng),
+                amount: element.lastAmount,
+                area: element.area
+              });
+            });
+            dispatch("makeMarkerFunction", { positions, map });
+          }
+        );
+      } else if (level > 3 && level <= 6) {
+        commit("REMOVE_OVERLAYS");
+        commit("REMOVE_MARKERS");
+        aptListByDong(
+          {
+            minArea: Math.round(value[0][0] * 3.305),
+            maxArea: Math.round(value[0][1] * 3.305),
+            minAmount: value[1][0] * 10000,
+            maxAmount: value[1][1] * 10000,
+            minBuildYear: value[2][0] + 2000,
+            maxBuildYear: value[2][1] + 2000
+          },
+          response => {
+            let positions = [];
+            response.data.forEach(element => {
+              positions.push({
+                latlng: new kakao.maps.LatLng(element.lat, element.lng),
+                amount: element.avgAmount,
+                area: element.dongName
+              });
+            });
+            dispatch("makeMarkerFunction", { positions, map });
+          }
+        );
+      } else if (level == 7) {
+        commit("REMOVE_OVERLAYS");
+        commit("REMOVE_MARKERS");
+
+        aptListByGugun(
+          {
+            minArea: Math.round(value[0][0] * 3.305),
+            maxArea: Math.round(value[0][1] * 3.305),
+            minAmount: value[1][0] * 10000,
+            maxAmount: value[1][1] * 10000,
+            minBuildYear: value[2][0] + 2000,
+            maxBuildYear: value[2][1] + 2000
+          },
+          response => {
+            let positions = [];
+            response.data.forEach(element => {
+              positions.push({
+                latlng: new kakao.maps.LatLng(element.lat, element.lng),
+                amount: element.avgAmount,
+                area: element.gugunName
+              });
+            });
+            dispatch("makeMarkerFunction", { positions, map });
+          },
+          error => {}
+        );
+      }
+      commit("SET_LEVEL", level);
+    },
+    setFilterValue({ commit }, val) {
+      commit("SET_FILTERVALUE", val);
+    },
     makeMarker(
-      { commit, dispatch },
+      { dispatch },
       {
-        clusterer,
+        // clusterer,
         map,
         minAmount,
         maxAmount,
@@ -399,12 +506,12 @@ const mapStore = {
         maxBuildYear
       }
     ) {
-      aptList(
+      aptListByDong(
         {
-          minAmount: minAmount,
-          maxAmount: maxAmount,
           minArea: minArea,
           maxArea: maxArea,
+          minAmount: minAmount,
+          maxAmount: maxAmount,
           minBuildYear: minBuildYear,
           maxBuildYear: maxBuildYear
         },
@@ -412,107 +519,107 @@ const mapStore = {
           let positions = [];
           response.data.forEach(element => {
             positions.push({
-              aptCode: element.aptCode,
-              title: element.aptName,
               latlng: new kakao.maps.LatLng(element.lat, element.lng),
-              lastAmount: element.lastAmount,
-              area: element.area
+              amount: element.avgAmount,
+              area: element.dongName
             });
           });
-
-          kakao.maps.event.addListener(clusterer, "clustered", clusters => {
-            clusters.forEach(eleCluster => {
-              let sum = 0;
-              eleCluster._markers.forEach(marker => {
-                if (marker.cc) {
-                  let startIndex = marker.cc.innerText.indexOf("평");
-                  let endIndex = marker.cc.innerText.indexOf("억");
-                  sum += Number(
-                    marker.cc.innerText.substring(startIndex + 1, endIndex)
-                  );
-                }
-              });
-              eleCluster._content.innerHTML =
-                Math.round((sum / (eleCluster._markers.length / 2)) * 100) /
-                  100 +
-                "억";
-            });
-          });
-
-          for (let i = 0; i < positions.length; i++) {
-            // 마커 이미지의 이미지 크기 입니다
-            let imageSize = new kakao.maps.Size(55, 55);
-
-            // 마커 이미지를 생성합니다
-            let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-            // 마커를 생성합니다
-            let marker = new kakao.maps.Marker({
-              map: map, // 마커를 표시할 지도
-              position: positions[i].latlng, // 마커를 표시할 위치
-              title: positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
-              image: markerImage // 마커 이미지
-            });
-            commit("SET_MARKERS", marker);
-
-            let aptCode = positions[i].aptCode;
-            let latlng = positions[i].latlng;
-
-            let markerClick = function() {
-              let pageNum = 1;
-              let pageSize = 6;
-              dispatch("getAptDealByAptCode", { aptCode, pageNum, pageSize });
-              // commit("SET_MAPLEVEL");
-              map.panTo(latlng);
-            };
-
-            kakao.maps.event.addListener(marker, "click", markerClick);
-            let content = document.createElement("div");
-            let areaContent = document.createElement("p");
-            let amountContent = document.createElement("p");
-
-            let areaText = document.createTextNode(
-              Math.round(positions[i].area / 3.3058) + "평"
-            );
-            let amountText = document.createTextNode(
-              Math.round(Math.round(positions[i].lastAmount / 100) / 100) + "억"
-            );
-            areaContent.appendChild(areaText);
-            amountContent.appendChild(amountText);
-
-            content.appendChild(areaContent);
-            content.appendChild(amountContent);
-            content.className = "custom-marker";
-
-            content.addEventListener("click", markerClick);
-
-            var overlay = new kakao.maps.CustomOverlay({
-              content: content,
-              map: map,
-              position: latlng,
-              value: Math.round(positions[i].avgAmount / 100) / 100
-            });
-
-            clusterer.addMarker(marker);
-
-            overlay.setMap(map);
-            clusterer.addMarker(overlay);
-
-            commit("SET_OVERLAYS", overlay);
-
-            kakao.maps.event.addListener(marker, "mouseover", function() {
-              // console.log("marker mouseover!");
-            });
-
-            kakao.maps.event.addListener(marker, "mouseout", function() {
-              // console.log("marker mouseout!");
-            });
-          }
-
-          if (positions.length > 0) {
-            map.setCenter(positions[0].latlng);
-          }
+          dispatch("makeMarkerFunction", { positions, map });
         }
       );
+    },
+
+    makeMarkerFunction({ commit, dispatch, getters }, { positions, map }) {
+      let level = getters.level;
+
+      for (let i = 0; i < positions.length; i++) {
+        // 마커 이미지의 이미지 크기 입니다
+        let imageSize = new kakao.maps.Size(75, 55);
+
+        // 마커 이미지를 생성합니다
+        let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+        // 마커를 생성합니다
+        let marker = new kakao.maps.Marker({
+          map: map, // 마커를 표시할 지도
+          position: positions[i].latlng, // 마커를 표시할 위치
+          title: positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+          image: markerImage // 마커 이미지
+        });
+        commit("SET_MARKERS", marker);
+
+        let aptCode = positions[i].aptCode;
+        let latlng = positions[i].latlng;
+
+        let markerClick = function() {
+          let pageNum = 1;
+          let pageSize = 6;
+          dispatch("getAptDealByAptCode", { aptCode, pageNum, pageSize });
+          // commit("SET_MAPLEVEL");
+          map.setLevel(2);
+          map.panTo(latlng);
+        };
+
+        let markerClickDong = function() {
+          map.panTo(latlng);
+          map.setLevel(3);
+        };
+
+        let markerClickGugun = function() {
+          map.panTo(latlng);
+          map.setLevel(5);
+        };
+
+        let content = document.createElement("div");
+        let areaContent = document.createElement("p");
+        let amountContent = document.createElement("p");
+
+        if (!isNaN(positions[i].area)) {
+          let areaText = document.createTextNode(
+            Math.round(positions[i].area / 3.3058) + "평"
+          );
+          areaContent.appendChild(areaText);
+        } else {
+          let areaText = document.createTextNode(positions[i].area);
+          areaContent.appendChild(areaText);
+        }
+        let amountText = document.createTextNode(
+          Math.round(Math.round(positions[i].amount / 100) / 100) + "억"
+        );
+        amountContent.appendChild(amountText);
+
+        content.appendChild(areaContent);
+        content.appendChild(amountContent);
+        content.className = "custom-marker";
+        if (level <= 3) {
+          content.addEventListener("click", markerClick);
+          kakao.maps.event.addListener(marker, "click", markerClick);
+        } else if (level <= 6) {
+          content.addEventListener("click", markerClickDong);
+          kakao.maps.event.addListener(marker, "click", markerClickDong);
+        } else {
+          content.addEventListener("click", markerClickGugun);
+          kakao.maps.event.addListener(marker, "click", markerClickGugun);
+        }
+
+        var overlay = new kakao.maps.CustomOverlay({
+          content: content,
+          map: map,
+          position: latlng,
+          value: Math.round(positions[i].avgAmount / 100) / 100
+        });
+
+        overlay.setMap(map);
+
+        commit("SET_OVERLAYS", overlay);
+
+        kakao.maps.event.addListener(marker, "mouseover", function() {
+          // console.log("marker mouseover!");
+        });
+
+        kakao.maps.event.addListener(marker, "mouseout", function() {
+          // console.log("marker mouseout!");
+        });
+      }
     },
 
     async getAptDealByAptCode(
@@ -590,7 +697,9 @@ const mapStore = {
           commit("SET_CURRENTDONGCODE", response.data.list[0].dongCode);
           commit(
             "SET_APTADDRESS",
-            response.data.list[0].gugunName +
+            response.data.list[0].sidoName +
+              " " +
+              response.data.list[0].gugunName +
               " " +
               response.data.list[0].dongName +
               " " +
@@ -612,7 +721,9 @@ const mapStore = {
         response => {
           commit(
             "SET_TITLE",
-            response.data.list[0].gugunName +
+            response.data.list[0].sidoName +
+              " " +
+              response.data.list[0].gugunName +
               " " +
               response.data.list[0].dongName
           );
@@ -648,7 +759,9 @@ const mapStore = {
           commit("SET_TITLE", response.data.list[0].aptName);
           commit(
             "SET_APTADDRESS",
-            response.data.list[0].gugunName +
+            response.data.list[0].sidoName +
+              " " +
+              response.data.list[0].gugunName +
               " " +
               response.data.list[0].dongName +
               " " +
