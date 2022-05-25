@@ -83,7 +83,6 @@ export default {
           });
           i++;
         }
-        console.log(this.newsList);
       },
       error => {}
     );

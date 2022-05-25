@@ -102,16 +102,15 @@
         >
           <div class="mb-5">
             <h5>
-              전용면적 : {{ value[0][0] }} m<sup>2</sup> 이상 ~
-              {{ value[0][1] }} m<sup>2</sup> 미만
+              전용면적 : {{ value[0][0] }} 평 이상 ~ {{ value[0][1] }} 평 미만
             </h5>
             <vue-slider
               v-model="value[0]"
               :process="process"
               :tooltip="'none'"
               :min="0"
-              :max="300"
-              :interval="50"
+              :max="100"
+              :interval="20"
               :marks="marks_1"
             ></vue-slider>
           </div>
@@ -210,11 +209,11 @@ export default {
   data() {
     return {
       value: [
-        [0, 300],
+        [0, 100],
         [0, 30],
         [0, 21]
       ],
-      marks_1: [0, 50, 100, 150, 200, 250, 300],
+      marks_1: [0, 20, 40, 60, 80, 100],
       marks_2: [0, 5, 10, 15, 20, 25, 30],
       marks_3: [0, 3, 6, 9, 12, 15, 18, 21],
       process: dotsPos => [
@@ -236,8 +235,8 @@ export default {
       this.makeMarker({
         clusterer: this.clusterer,
         map: this.map,
-        minArea: val[0][0],
-        maxArea: val[0][1],
+        minArea: Math.round(val[0][0] * 3.305),
+        maxArea: Math.round(val[0][1] * 3.305),
         minAmount: val[1][0] * 10000,
         maxAmount: val[1][1] * 10000,
         minBuildYear: val[2][0] + 2000,
@@ -256,7 +255,7 @@ export default {
     },
     filterReset() {
       this.value = [
-        [0, 300],
+        [0, 100],
         [0, 30],
         [0, 21]
       ];
