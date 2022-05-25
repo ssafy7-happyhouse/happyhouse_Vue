@@ -119,6 +119,7 @@
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
 import { getKakaoToken, getKakaoUserInfo } from "@/services/kakaoLogin";
+import {findByKakaoId, signUp} from "@/api/user";
 import VueCookies from "vue-cookies";
 
 const userStore = "userStore";
@@ -162,7 +163,7 @@ export default {
     },
     async setKakaoToken() {
       console.log("카카오 인증 코드", this.$route.query.code);
-      const { data } = await getKakaoToken(this.$route.query.code);
+      const { data } = await getKakaoToken(this.$route.query.code, "http://localhost:8080/login");
       if (data.error) {
         alert("카카오톡 로그인 오류입니다.");
         this.$router.go();
@@ -181,11 +182,43 @@ export default {
       const res = await getKakaoUserInfo();
       console.log(res);
       const userInfo = {
-        id: res.kakao_account.profile.nickname,
+        id: res.id,
+        name: res.kakao_account.profile.nickname,
         platform: "kakao"
       };
+                this.SET_USER_INFO(userInfo);
+
       // this.$store.commit("SET_USER_INFO", userInfo);
-      this.SET_USER_INFO(userInfo);
+      // await findByKakaoId(userInfo.id,({data})=>{
+      //   if(data.userid != null){
+      //     this.SET_USER_INFO(userInfo);
+      //   }else{
+      //     signUp(
+      //   {
+      //   id: userInfo.id,
+      //   name: userInfo.name,
+      //   address: "kakao",
+      //   phone: "",
+      //   favorite: "",
+      //   password: userInfo.id+admin_str,
+      //   // agree: false
+      // },
+      //   response => {
+      //     if (response.data.message === "success") {
+      //       alert("회원가입이 완료되었습니다.");
+      //       this.$router.push({ name: "home" });
+      //     } else if (response.data.message === "similarlity") {
+      //       alert("아이디와 비밀번호의 유사도가 높습니다.");
+      //     } else {
+      //       alert("회원가입이 실패했습니다.");
+      //     }
+      //   },
+      //   fail => {
+      //     console.log(fail);
+      //   }
+      // );
+      //   }
+      // })
       console.log(userInfo);
     }
   },

@@ -160,6 +160,7 @@ import http from "@/api/http";
 
 import CommentItem from "@/views/Pages/Board/CommentItem.vue";
 import moment from "moment";
+import {  mapState } from "vuex";
 
 export default {
   components: {
@@ -184,6 +185,7 @@ export default {
     };
   },
   computed: {
+    ...mapState("qnaStore",["boardno"]),
     messageContent() {
       if (this.board.content)
         return this.board.content.split("\n").join("<br>");
@@ -242,11 +244,11 @@ export default {
   },
   created() {
     getArticleCommentByBoardno(
-      this.$route.params.boardno,
+      this.boardno,
       response => {
         console.log(response);
         this.board = response.data;
-        this.comment.no = this.$route.params.boardno;
+        this.comment.no = this.boardno;
 
         let registDate = moment(this.board.registDate)
           .add(-9, "h")

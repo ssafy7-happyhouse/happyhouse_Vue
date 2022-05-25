@@ -5,12 +5,12 @@ const kakaoHeader = {
   "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
 };
 
-const getKakaoToken = async code => {
+const getKakaoToken = async (code, uri) => {
   try {
     const data = {
       grant_type: "authorization_code",
       client_id: "58f416aeb1757e4fc6a6a6f9477c88ef",
-      redirect_uri: "http://localhost:8080/login",
+      redirect_uri: uri,
       code: code
     };
     const queryString = Object.keys(data)
@@ -47,4 +47,20 @@ const getKakaoUserInfo = async () => {
   return data;
 };
 
-export { getKakaoToken, getKakaoUserInfo };
+const dropKakaoUser = async () => {
+  let data = "";
+  console.log(1);
+  await window.Kakao.API.request({
+    url: "/v1/user/unlink",
+    success: function(response) {
+      data = response;
+    },
+    fail: function(error) {
+      console.log(error);
+    }
+  });
+  console.log("카카오 계정 정보", data);
+  // return data;
+};
+
+export { getKakaoToken, getKakaoUserInfo, dropKakaoUser };
