@@ -228,24 +228,22 @@ export default {
   },
   watch: {
     value(val) {
-      this.REMOVE_CLUSTERER;
       this.REMOVE_OVERLAYS;
       this.REMOVE_MARKERS;
+      let level = this.level;
+      let map = this.map;
+      this.changeZoom({ level, map });
 
-      this.makeMarker({
-        clusterer: this.clusterer,
-        map: this.map,
-        minArea: Math.round(val[0][0] * 3.305),
-        maxArea: Math.round(val[0][1] * 3.305),
-        minAmount: val[1][0] * 10000,
-        maxAmount: val[1][1] * 10000,
-        minBuildYear: val[2][0] + 2000,
-        maxBuildYear: val[2][1] + 2000
-      });
+      this.setFilterValue(val);
     }
   },
   methods: {
-    ...mapActions("mapStore", ["makeMarker", "markerClick"]),
+    ...mapActions("mapStore", [
+      "makeMarker",
+      "markerClick",
+      "setFilterValue",
+      "changeZoom"
+    ]),
     closeFilterAndSideBar() {
       document.getElementById("customSidebar").style.width = "0px";
       document.getElementById("custom-filter").style.left = "-80%";
@@ -280,11 +278,12 @@ export default {
     ...mapMutations("mapStore", [
       "REMOVE_MARKERS",
       "REMOVE_OVERLAYS",
-      "REMOVE_CLUSTERER"
+      "REMOVE_CLUSTERER",
+      "SET_FILTERVALUE"
     ]),
 
     ...mapState(userStore, ["userInfo"]),
-    ...mapState("mapStore", ["map", "clusterer"])
+    ...mapState("mapStore", ["map", "clusterer", "level"])
   }
 };
 </script>
@@ -295,5 +294,6 @@ export default {
   bottom: 20px;
   color: white;
   cursor: pointer;
+  text-align: center;
 }
 </style>

@@ -36,6 +36,24 @@ function aptListByDongCode(params, page, success, fail) {
     .catch(fail);
 }
 
+function aptListByDong(params, success, fail) {
+  api
+    .get(
+      `/apartment/dong?minAmount=${params.minAmount}&maxAmount=${params.maxAmount}&minArea=${params.minArea}&maxArea=${params.maxArea}&minBuildYear=${params.minBuildYear}&maxBuildYear=${params.maxBuildYear}`
+    )
+    .then(success)
+    .catch(fail);
+}
+
+function aptListByGugun(params, success, fail) {
+  api
+    .get(
+      `/apartment/gugun?minAmount=${params.minAmount}&maxAmount=${params.maxAmount}&minArea=${params.minArea}&maxArea=${params.maxArea}&minBuildYear=${params.minBuildYear}&maxBuildYear=${params.maxBuildYear}`
+    )
+    .then(success)
+    .catch(fail);
+}
+
 function aptDetailListByAptCodeAndAptName(params, page, success, fail) {
   api
     .get(
@@ -57,5 +75,7 @@ export {
   aptDetailListByaptCode,
   aptListByDongCode,
   aptDetailListByAptCodeAndAptName,
-  aptDealByAptCode
+  aptDealByAptCode,
+  aptListByDong,
+  aptListByGugun
 };
