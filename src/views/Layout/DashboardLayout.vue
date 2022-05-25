@@ -4,6 +4,7 @@
     <side-bar style="z-index:1090;">
       <template slot="links">
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'Home',
             path: '/home',
@@ -13,6 +14,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'Board',
             path: '/board',
@@ -22,6 +24,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'QnA',
             path: '/qna',
@@ -31,6 +34,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'News',
             path: '/news',
@@ -40,6 +44,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'User Profile',
             path: '/profile',
@@ -50,6 +55,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'Login',
             path: '/login',
@@ -71,6 +77,7 @@
         </sidebar-item>
 
         <sidebar-item
+          @click.native="closeFilterAndSideBar"
           :link="{
             name: 'Register',
             path: '/register',
@@ -97,16 +104,15 @@
         >
           <div class="mb-5">
             <h5>
-              전용면적 : {{ value[0][0] }} m<sup>2</sup> 이상 ~
-              {{ value[0][1] }} m<sup>2</sup> 미만
+              전용면적 : {{ value[0][0] }} 평 이상 ~ {{ value[0][1] }} 평 미만
             </h5>
             <vue-slider
               v-model="value[0]"
               :process="process"
               :tooltip="'none'"
               :min="0"
-              :max="300"
-              :interval="50"
+              :max="100"
+              :interval="20"
               :marks="marks_1"
             ></vue-slider>
           </div>
@@ -205,11 +211,11 @@ export default {
   data() {
     return {
       value: [
-        [0, 300],
+        [0, 100],
         [0, 30],
         [0, 21]
       ],
-      marks_1: [0, 50, 100, 150, 200, 250, 300],
+      marks_1: [0, 20, 40, 60, 80, 100],
       marks_2: [0, 5, 10, 15, 20, 25, 30],
       marks_3: [0, 3, 6, 9, 12, 15, 18, 21],
       process: dotsPos => [
@@ -224,31 +230,32 @@ export default {
   },
   watch: {
     value(val) {
-      this.REMOVE_CLUSTERER;
       this.REMOVE_OVERLAYS;
       this.REMOVE_MARKERS;
+      let level = this.level;
+      let map = this.map;
+      this.changeZoom({ level, map });
 
-      this.makeMarker({
-        clusterer: this.clusterer,
-        map: this.map,
-        minArea: val[0][0],
-        maxArea: val[0][1],
-        minAmount: val[1][0] * 10000,
-        maxAmount: val[1][1] * 10000,
-        minBuildYear: val[2][0] + 2000,
-        maxBuildYear: val[2][1] + 2000
-      });
+      this.setFilterValue(val);
     }
   },
   methods: {
-    ...mapActions("mapStore", ["makeMarker", "markerClick"]),
-
+    ...mapActions("mapStore", [
+      "makeMarker",
+      "markerClick",
+      "setFilterValue",
+      "changeZoom"
+    ]),
+    closeFilterAndSideBar() {
+      document.getElementById("customSidebar").style.width = "0px";
+      document.getElementById("custom-filter").style.left = "-80%";
+    },
     filterClose() {
-      document.getElementById("custom-filter").style.left = "-40%";
+      document.getElementById("custom-filter").style.left = "-80%";
     },
     filterReset() {
       this.value = [
-        [0, 300],
+        [0, 100],
         [0, 30],
         [0, 21]
       ];
@@ -260,6 +267,7 @@ export default {
       }
     },
     logout() {
+      this.closeFilterAndSideBar();
       sessionStorage.clear();
       this.$router.push({ name: home });
     }
@@ -272,11 +280,12 @@ export default {
     ...mapMutations("mapStore", [
       "REMOVE_MARKERS",
       "REMOVE_OVERLAYS",
-      "REMOVE_CLUSTERER"
+      "REMOVE_CLUSTERER",
+      "SET_FILTERVALUE"
     ]),
 
     ...mapState(userStore, ["userInfo"]),
-    ...mapState("mapStore", ["map", "clusterer"])
+    ...mapState("mapStore", ["map", "clusterer", "level"])
   }
 };
 </script>
@@ -287,5 +296,6 @@ export default {
   bottom: 20px;
   color: white;
   cursor: pointer;
+  text-align: center;
 }
 </style>

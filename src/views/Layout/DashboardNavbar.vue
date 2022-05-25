@@ -58,12 +58,16 @@
                   @click="
                     moveAddress(
                       address.dongCode,
+                      address.sidoName,
                       address.gugunName,
                       address.dongName
                     )
                   "
                 >
-                  <span>{{ address.gugunName }} {{ address.dongName }}</span>
+                  <span
+                    >{{ address.sidoName }} {{ address.gugunName }}
+                    {{ address.dongName }}</span
+                  >
                 </b-dropdown-item>
 
                 <div class="dropdown-divider"></div>
@@ -197,23 +201,23 @@ export default {
       this.addresses = [];
       this.apartments = [];
     },
-    moveAddress(dongCode, gugunName, dongName) {
+    moveAddress(dongCode, sidoName, gugunName, dongName) {
       const geocoder = new kakao.maps.services.Geocoder();
       let pageNum = 1;
       let pageSize = 6;
       this.getAptListByDongCode({ dongCode, pageNum, pageSize });
       // 주소로 좌표를 검색합니다
       const map = this.map;
-      geocoder.addressSearch(gugunName + " " + dongName, function(
-        result,
-        status
-      ) {
-        // 정상적으로 검색이 완료됐으면
-        if (status === kakao.maps.services.Status.OK) {
-          map.panTo(new kakao.maps.LatLng(result[0].y, result[0].x));
-          map.setLevel(3);
+      geocoder.addressSearch(
+        sidoName + " " + gugunName + " " + dongName,
+        function(result, status) {
+          // 정상적으로 검색이 완료됐으면
+          if (status === kakao.maps.services.Status.OK) {
+            map.panTo(new kakao.maps.LatLng(result[0].y, result[0].x));
+            map.setLevel(3);
+          }
         }
-      });
+      );
       this.addresses = [];
       this.apartments = [];
     },
@@ -238,5 +242,4 @@ window.onclick = e => {
     document.getElementById("myDropdown").classList.remove("show");
   }
 };
-
 </script>

@@ -91,7 +91,7 @@ const routes = [
         path: "/news",
         name: "news",
         component: () =>
-          import(/* webpackChunkName: "demo" */ "../views/RegularTables.vue")
+          import(/* webpackChunkName: "demo" */ "../views/NewsView.vue")
       },
       {
         path: "/profile",
