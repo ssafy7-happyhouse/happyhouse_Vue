@@ -233,7 +233,8 @@ export default {
       this.REMOVE_MARKERS;
       let level = this.level;
       let map = this.map;
-      this.changeZoom({ level, map });
+      let check = true;
+      this.changeZoom({ level, map, check });
 
       this.setFilterValue(val);
     }
