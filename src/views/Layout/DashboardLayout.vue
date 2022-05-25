@@ -16,16 +16,6 @@
         <sidebar-item
           @click.native="closeFilterAndSideBar"
           :link="{
-            name: 'Board',
-            path: '/board',
-            icon: 'ni ni-planet text-blue'
-          }"
-        >
-        </sidebar-item>
-
-        <sidebar-item
-          @click.native="closeFilterAndSideBar"
-          :link="{
             name: 'QnA',
             path: '/qna',
             icon: 'ni ni-bullet-list-67 text-red'
@@ -84,7 +74,16 @@
             icon: 'ni ni-circle-08 text-pink'
           }"
           v-if="!userInfo"
+        >
+        </sidebar-item>
 
+        <sidebar-item
+          :link="{
+            name: 'management',
+            path: '/management',
+            icon: 'ni ni-planet text-blue'
+          }"
+          v-if="adminCheck()"
         >
         </sidebar-item>
       </template>
@@ -223,6 +222,9 @@ export default {
       ]
     };
   },
+  computed: {
+    ...mapState("userStore", ["userInfo"])
+  },
   filters: {
     yearFormat(value) {
       return "20" + (value < 10 ? "0" + value : value);
@@ -246,6 +248,16 @@ export default {
       "setFilterValue",
       "changeZoom"
     ]),
+    adminCheck() {
+      if (this.userInfo == null) {
+        return false;
+      }
+      if (this.userInfo.id == "admin") {
+        return true;
+      } else {
+        return false;
+      }
+    },
     closeFilterAndSideBar() {
       document.getElementById("customSidebar").style.width = "0px";
       document.getElementById("custom-filter").style.left = "-80%";
