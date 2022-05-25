@@ -6,7 +6,7 @@
     >
       <!-- <b-container fluid> -->
       <!-- Mask -->
-      <span class="mask bg-gradient-success "></span>
+      <span class="mask bg-gradient-primary "></span>
       <!-- Header container -->
       <!-- <b-container fluid class="d-flex align-items-center">
           <b-row>

@@ -38,26 +38,16 @@
             :key="this.aptAddress"
           >
           </bar-chart>
-          <!-- <line-chart
-            :height="250"
-            :key="this.aptAddress"
-            :chart-data="this.chartData"
-          >
-          </line-chart> -->
         </div>
       </div>
     </div>
-    <!-- <a href="#">About</a>
-    <a href="#">Services</a>
-    <a href="#">Clients</a>
-    <a href="#">Contact</a> -->
   </div>
 </template>
 <script>
 import NavbarToggleButton from "@/components/NavbarToggleButton";
 import LineChart from "@/components/Charts/LineChart";
 import BarChart from "@/components/Charts/BarChart";
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapMutations } from "vuex";
 
 export default {
   name: "sidebar",
@@ -68,7 +58,6 @@ export default {
   },
   data() {
     return {
-      selected: "A",
       options: [
         { value: "A", text: "막대그래프" },
         { value: "B", text: "곡선그래프" }
@@ -91,6 +80,7 @@ export default {
     };
   },
   computed: {
+    ...mapMutations("mapStore", ["REMOVE_CUSTOMOVERLAY"]),
     ...mapGetters("mapStore", [
       "title",
       "aptList",
@@ -99,24 +89,53 @@ export default {
       "pageNum",
       "pageSize",
       "pages",
-      "chartData"
+      "chartData",
+      "markerLatLng",
+      "map",
+      "customOverlay"
     ])
   },
   watch: {
-    selected(value) {
-      if (value == "A") {
-      }
+    markerLatLng(value) {
+      this.checkMarker();
     },
     pageNum(value) {
-      console.log(1);
       this.curPageNum = value;
     }
   },
   methods: {
     ...mapActions("mapStore", [
       "getAptListByDongCodeAndAptName",
-      "getAptListByDongCode"
+      "getAptListByDongCode",
+      "setCustomOverlay"
     ]),
+    checkMarker() {
+      if (this.customOverlay != null) {
+        this.REMOVE_CUSTOMOVERLAY;
+      }
+      // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+      var content =
+        '<div class="customoverlay">' +
+        '    <span class="title">' +
+        this.title +
+        "</span>" +
+        "  </a>" +
+        "</div>";
+      // 커스텀 오버레이가 표시될 위치입니다
+      var position = new kakao.maps.LatLng(
+        this.markerLatLng[0],
+        this.markerLatLng[1]
+      );
+
+      // 커스텀 오버레이를 생성합니다
+      var customOverlay = new kakao.maps.CustomOverlay({
+        map: this.map,
+        position: position,
+        content: content,
+        yAnchor: 1
+      });
+      this.setCustomOverlay({ customOverlay });
+    },
 
     closeSidebar() {
       document.getElementById("customSidebar").style.width = "0";

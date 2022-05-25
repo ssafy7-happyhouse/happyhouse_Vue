@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="header bg-gradient-success py-7 py-lg-8 pt-lg-9">
+    <div class="header bg-gradient-primary py-7 py-lg-8 pt-lg-9">
       <b-container>
         <div class="header-body text-center mb-7">
           <b-row class="justify-content-center">
@@ -119,7 +119,7 @@
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
 import { getKakaoToken, getKakaoUserInfo } from "@/services/kakaoLogin";
-import {findByKakaoId, signUp} from "@/api/user";
+import { findByKakaoId, signUp } from "@/api/user";
 import VueCookies from "vue-cookies";
 
 const userStore = "userStore";
@@ -163,7 +163,10 @@ export default {
     },
     async setKakaoToken() {
       console.log("카카오 인증 코드", this.$route.query.code);
-      const { data } = await getKakaoToken(this.$route.query.code, "http://localhost:8080/login");
+      const { data } = await getKakaoToken(
+        this.$route.query.code,
+        "http://localhost:8080/login"
+      );
       if (data.error) {
         alert("카카오톡 로그인 오류입니다.");
         this.$router.go();
@@ -186,7 +189,7 @@ export default {
         name: res.kakao_account.profile.nickname,
         platform: "kakao"
       };
-                this.SET_USER_INFO(userInfo);
+      this.SET_USER_INFO(userInfo);
 
       // this.$store.commit("SET_USER_INFO", userInfo);
       // await findByKakaoId(userInfo.id,({data})=>{

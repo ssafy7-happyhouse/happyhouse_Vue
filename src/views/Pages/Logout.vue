@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="header bg-gradient-success py-7 py-lg-8 pt-lg-9">
+    <div class="header bg-gradient-primary py-7 py-lg-8 pt-lg-9">
       <b-container>
         <div class="header-body text-center mb-7">
           <b-row class="justify-content-center">
@@ -112,7 +112,7 @@
 </template>
 <script>
 import { mapMutations, mapState } from "vuex";
-import {dropKakaoUser} from "@/services/kakaoLogin"
+import { dropKakaoUser } from "@/services/kakaoLogin";
 
 const userStore = "userStore";
 
