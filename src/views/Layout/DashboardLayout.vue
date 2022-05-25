@@ -83,6 +83,8 @@
             path: '/register',
             icon: 'ni ni-circle-08 text-pink'
           }"
+          v-if="!userInfo"
+
         >
         </sidebar-item>
       </template>

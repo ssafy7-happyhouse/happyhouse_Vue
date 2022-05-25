@@ -112,6 +112,7 @@
 </template>
 <script>
 import { mapMutations, mapState } from "vuex";
+import {dropKakaoUser} from "@/services/kakaoLogin"
 
 const userStore = "userStore";
 
@@ -122,12 +123,14 @@ export default {
   methods: {
     ...mapMutations(userStore, ["SET_IS_LOGIN", "SET_USER_INFO"]),
     logout() {
+      console.log(sessionStorage.getItem("refresh-token"));
       if (sessionStorage.getItem("refresh-token")) {
         Kakao.Auth.logout(function() {});
       }
       sessionStorage.clear();
       this.SET_USER_INFO(null);
       this.SET_IS_LOGIN(false);
+      // dropKakaoUser();
       this.$router.push({ name: "home" });
     }
   },

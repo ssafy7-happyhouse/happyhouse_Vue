@@ -44,7 +44,7 @@
                   <span class="btn-inner--icon"
                     ><img src="img/icons/common/kakaologo.jpg"
                   /></span>
-                  <span class="btn-inner--text">카카오톡으로 회원가입</span>
+                  <span class="btn-inner--text" @click="kakaoSignUp">카카오톡으로 회원가입</span>
                 </a>
                 <!-- <a href="#" class="btn btn-neutral btn-icon">
                   <span class="btn-inner--icon"
@@ -169,7 +169,8 @@
   </div>
 </template>
 <script>
-import { signUp } from "@/api/user.js";
+import { signUp, findByKakaoId } from "@/api/user.js";
+import { getKakaoToken, getKakaoUserInfo } from "@/services/kakaoLogin";
 
 export default {
   name: "register",
@@ -183,6 +184,10 @@ export default {
         favorite: "",
         password: ""
         // agree: false
+      },
+      token:{
+        access_token: "",
+        refresh_token: "",
       }
     };
   },
@@ -191,10 +196,10 @@ export default {
       signUp(
         this.model,
         response => {
-          if (response.data === "success") {
+          if (response.data.message === "success") {
             alert("회원가입이 완료되었습니다.");
             this.$router.push({ name: "login" });
-          } else if (response.data === "similarlity") {
+          } else if (response.data.message === "similarlity") {
             alert("아이디와 비밀번호의 유사도가 높습니다.");
           } else {
             alert("회원가입이 실패했습니다.");
@@ -208,6 +213,89 @@ export default {
       //   console.log(res);
       // });
       // this will be called only after form is valid. You can do an api call here to register users
+    },
+    kakaoSignUp(){ 
+      const param = {
+        redirectUri: "http://localhost:8080/register"
+      };
+      window.Kakao.Auth.authorize(param);
+    },
+    async setKakaoToken() {
+      console.log("카카오 인증 코드", this.$route.query.code);
+      const { data } = await getKakaoToken(this.$route.query.code, "http://localhost:8080/register");
+      if (data.error) {
+        alert("카카오톡 로그인 오류입니다.");
+        this.$router.go();
+        return;
+      }
+      window.Kakao.Auth.setAccessToken(data.access_token);
+      this.token.access_token = data.access_token;
+      this.token.refresh_token = data.refresh_token;
+      // this.$cookies.set("access-token", data.access_token, "1d");
+      // this.$cookies.set("refresh-token", data.refresh_token, "1d");
+      // 일단은 자동 로그인 되지 않게 하기 위헤 세션에 저장
+      // sessionStorage.setItem("access-token", data.access_token);
+      // sessionStorage.setItem("refresh-token", data.refresh_token);
+      await this.setUserInfo();
+      // this.$router.push({ name: "home" });
+    },
+    async setUserInfo() {
+      const res = await getKakaoUserInfo();
+      console.log(res);
+      const admin_str = "vsbvgih24rn23gf6vsdv12b12sd";
+      const userInfo = {
+        id: res.id,
+        name: res.kakao_account.profile.nickname,
+        address: res.kakao_account.email,
+
+        platform: "kakao"
+      };
+      // this.$store.commit("SET_USER_INFO", userInfo);
+      await findByKakaoId(userInfo.id,({data})=>{
+        console.log("여기를 확인해라");
+        console.log(data);
+        if(data.userId != null){
+            alert("이미 가입되어있는 회원입니다. 로그인을 진행해주세요.");
+            this.$router.push({ name: "login" });
+
+        }else{
+          signUp(
+        {
+        id: userInfo.id,
+        name: userInfo.name,
+        address: "kakao",
+        phone: "",
+        favorite: "",
+        password: userInfo.id+admin_str,
+        // agree: false
+      },
+        response => {
+          if (response.data.message === "success") {
+            sessionStorage.setItem("access-token", data.access_token);
+      sessionStorage.setItem("refresh-token", data.refresh_token);
+                this.SET_USER_INFO(userInfo);
+
+            alert("회원가입과 로그인이 완료되었습니다.");
+
+            this.$router.push({ name: "login" });
+          } else if (response.data.message === "similarlity") {
+            alert("아이디와 비밀번호의 유사도가 높습니다.");
+          } else {
+            alert("회원가입이 실패했습니다.");
+          }
+        },
+        fail => {
+          console.log(fail);
+        }
+      );
+        }
+      })
+      console.log(userInfo);
+    }
+  },
+  created() {
+    if (this.$route.query.code) {
+      this.setKakaoToken();
     }
   }
 };

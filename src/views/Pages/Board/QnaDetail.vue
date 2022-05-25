@@ -183,6 +183,7 @@ export default {
   },
   computed: {
     ...mapState("userStore", ["isLogin", "userInfo"]),
+    ...mapState("qnaStore", ["boardno"]),
     messageContent() {
       if (this.board.content)
         return this.board.content.split("\n").join("<br>");
@@ -225,10 +226,10 @@ export default {
   },
   created() {
     getArticleCommentByBoardno(
-      this.$route.params.boardno,
+      this.boardno,
       response => {
         this.board = response.data;
-        this.comment.no = this.$route.params.boardno;
+        this.comment.no = this.boardno;
 
         let registDate = moment(this.board.registDate)
           .add(-9, "h")
