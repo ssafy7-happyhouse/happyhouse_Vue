@@ -87,11 +87,17 @@
     </el-table>
 
     <b-card-footer class="py-4 d-flex justify-content-end">
-      <base-pagination
-        v-model="currentPage"
+      <!-- <base-pagination
+        v-model="curPageNum"
         :per-page="10"
         :total="50"
-      ></base-pagination>
+      ></base-pagination> -->
+      <b-pagination v-model="curPageNum"
+            :total-rows="totalRows"
+            :per-page="pageSize"
+            first-number
+            align="center"
+            @change="pageClick"></b-pagination>
     </b-card-footer>
   </b-card>
 </template>
@@ -100,7 +106,8 @@ import projects from "../projects";
 import { Table, TableColumn } from "element-ui";
 import { getList } from "@/api/qna.js";
 import moment from "moment";
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
+import {getListByPaging} from "@/api/qna.js"
 
 export default {
   name: "light-table",
@@ -111,7 +118,10 @@ export default {
   data() {
     return {
       projects,
-      currentPage: 1,
+      curPageNum: 1,
+      pageSize: 10,
+      totalRows: 0,
+      pages: null,
       boards: [],
       fields: [
         { key: "no", label: "글번호", tdClass: "tdClass" },
@@ -124,11 +134,47 @@ export default {
   },
   computed: {
     ...mapState("userStore", ["isLogin"])
+    
   },
   created() {
-    getList(
-      ({ data }) => {
-        data.forEach(board => {
+    // getList(
+    //   ({ data }) => {
+    //     data.forEach(board => {
+    //       board.registDate = moment(board.registDate)
+    //         .add(-9, "h")
+    //         .format("yyyy.MM.DD LT");
+    //       board.comment_content =
+    //         board.comment_content == null ? "답변대기" : "답변완료";
+    //       if (board.comment_content === "답변완료") {
+    //         board.statusType = "success";
+    //       } else {
+    //         board.statusType = "warning";
+    //       }
+    //       this.boards.push(board);
+    //     });
+    //     console.log(this.boards);
+    //   },
+    //   () => {}
+    // );
+    //  getListByPaging({
+    //     pageNum: 1,
+    //     pageSize: 10
+    //   },(response)=>{
+
+
+    //     this.board = response.data[0]
+    //     console.log(response.data[0]);
+    //   })
+    getListByPaging({
+        pageNum: 1,
+        pageSize: 10
+      },(response)=>{
+        console.log(response.data.total);
+        this.totalRows = response.data.total;
+        // this.boards = response.data.list;
+        //         this.pages = response.data.total;
+
+        response.data.list.forEach(board => {
           board.registDate = moment(board.registDate)
             .add(-9, "h")
             .format("yyyy.MM.DD LT");
@@ -141,13 +187,11 @@ export default {
           }
           this.boards.push(board);
         });
-        console.log(this.boards);
-      },
-      () => {}
-    );
+      });
   },
 
   methods: {
+    ...mapMutations("qnaStore", ["SET_BOARDNO"]),
     moveWrite() {
       if (this.isLogin) {
         this.$router.push({ name: "boardRegister" });
@@ -157,6 +201,7 @@ export default {
     },
     viewBoard(board) {
       console.log(board.no);
+      this.SET_BOARDNO(board.no);
       this.$router.push({
         name: "boardDetail",
         params: { boardno: board.no }
@@ -164,6 +209,26 @@ export default {
     },
     log() {
       console.log(this.boards);
+    },
+    pageClick(event) {
+      let pageNum = event;
+      let pageSize = 10;
+      this.boards = [],
+      getListByPaging({pageNum,pageSize},(response)=>{
+        response.data.list.forEach(board => {
+          board.registDate = moment(board.registDate)
+            .add(-9, "h")
+            .format("yyyy.MM.DD LT");
+          board.comment_content =
+            board.comment_content == null ? "답변대기" : "답변완료";
+          if (board.comment_content === "답변완료") {
+            board.statusType = "success";
+          } else {
+            board.statusType = "warning";
+          }
+          this.boards.push(board);
+        });
+      })
     }
   }
 };

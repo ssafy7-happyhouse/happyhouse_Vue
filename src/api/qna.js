@@ -30,11 +30,19 @@ async function getArticleByBoardno(boardno, success, fail) {
     .catch(fail);
 }
 
+async function getListByPaging(pageInfo, success, fail) {
+  await api
+    .get(`/qna/${pageInfo.pageNum}/${pageInfo.pageSize}`)
+    .then(success)
+    .catch(fail);
+}
+
 // function logout(success, fail)
 
 export {
   getList,
   getArticleCommentByBoardno,
   deleteArticle,
-  getArticleByBoardno
+  getArticleByBoardno,
+  getListByPaging
 };

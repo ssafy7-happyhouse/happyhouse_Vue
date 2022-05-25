@@ -17,6 +17,13 @@ async function findById(userid, success, fail) {
     .catch(fail);
 }
 
+async function findByKakaoId(userid, success, fail) {
+  await api
+    .get(`/user/id/${userid}`)
+    .then(success)
+    .catch(fail);
+}
+
 async function signUp(user, success, fail) {
   await api
     .post("/user/signUp", JSON.stringify(user))
@@ -40,4 +47,4 @@ async function updateMyInfo(userInfo, success, fail) {
 
 // function logout(success, fail)
 
-export { login, findById, signUp, getMyInfo, updateMyInfo };
+export { login, findById, signUp, getMyInfo, updateMyInfo, findByKakaoId };

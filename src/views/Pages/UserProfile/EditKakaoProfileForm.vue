@@ -38,7 +38,7 @@
               type="text"
               label="사용자 이름"
               placeholder="이름"
-              v-model="userInfo.id"
+              v-model="userInfo.name"
               readonly
             >
             </base-input>
