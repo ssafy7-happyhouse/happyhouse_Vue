@@ -19,11 +19,11 @@ const routes = [
           import(/* webpackChunkName: "demo" */ "../views/HomeView.vue")
       },
       {
-        path: "/board",
-        name: "board",
+        path: "/management",
+        name: "management",
         component: () =>
           import(
-            /* webpackChunkName: "demo" */ "../views/RegularNoticeTables.vue"
+            /* webpackChunkName: "demo" */ "../views/RegularManagementTables.vue"
           )
       },
       {

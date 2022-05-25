@@ -92,6 +92,7 @@
 <script>
 import http from "@/api/http";
 import jwt_decode from "jwt-decode";
+import { mapState } from "vuex";
 
 export default {
   name: "CommentItem",
@@ -108,6 +109,7 @@ export default {
     this.content = this.parentComment.content;
   },
   computed: {
+    ...mapState("userStore", ["userInfo"]),
     messageCommentContent() {
       if (this.parentComment.content)
         return this.parentComment.content.split("\n").join("<br>");
@@ -190,7 +192,11 @@ export default {
       this.modifyFlag = false;
     },
     adminCheck() {
-      return false;
+      if (this.userInfo.id == "admin") {
+        return true;
+      } else {
+        return false;
+      }
     },
     changeFlag() {
       this.modifyFlag = true;

@@ -14,15 +14,6 @@
 
         <sidebar-item
           :link="{
-            name: 'Board',
-            path: '/board',
-            icon: 'ni ni-planet text-blue'
-          }"
-        >
-        </sidebar-item>
-
-        <sidebar-item
-          :link="{
             name: 'QnA',
             path: '/qna',
             icon: 'ni ni-bullet-list-67 text-red'
@@ -77,7 +68,16 @@
             icon: 'ni ni-circle-08 text-pink'
           }"
           v-if="!userInfo"
+        >
+        </sidebar-item>
 
+        <sidebar-item
+          :link="{
+            name: 'management',
+            path: '/management',
+            icon: 'ni ni-planet text-blue'
+          }"
+          v-if="adminCheck()"
         >
         </sidebar-item>
       </template>
@@ -217,6 +217,9 @@ export default {
       ]
     };
   },
+  computed: {
+    ...mapState("userStore", ["userInfo"])
+  },
   filters: {
     yearFormat(value) {
       return "20" + (value < 10 ? "0" + value : value);
@@ -242,7 +245,16 @@ export default {
   },
   methods: {
     ...mapActions("mapStore", ["makeMarker", "markerClick"]),
-
+    adminCheck() {
+      if (this.userInfo == null) {
+        return false;
+      }
+      if (this.userInfo.id == "admin") {
+        return true;
+      } else {
+        return false;
+      }
+    },
     filterClose() {
       document.getElementById("custom-filter").style.left = "-40%";
     },

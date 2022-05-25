@@ -8,6 +8,12 @@
         <a href="#!" class="btn btn-sm btn-primary" @click="updateProfile"
           >수정</a
         >
+        <a
+          href="#!"
+          class="btn btn-sm btn-primary"
+          @click="deleteProfile(user.id)"
+          >탈퇴</a
+        >
       </b-col>
     </b-row>
 
@@ -129,6 +135,9 @@
 <script>
 import { findById, updateMyInfo } from "@/api/user";
 import jwt_decode from "jwt-decode";
+import { deleteUserById } from "@/api/user";
+import { mapMutations, mapState } from "vuex";
+const userStore = "userStore";
 
 export default {
   data() {
@@ -141,7 +150,11 @@ export default {
       }
     };
   },
+  computed: {
+    ...mapState(userStore, ["userInfo"])
+  },
   methods: {
+    ...mapMutations(userStore, ["SET_IS_LOGIN", "SET_USER_INFO"]),
     updateProfile() {
       updateMyInfo(
         this.user,
@@ -158,6 +171,32 @@ export default {
         () => {}
       );
       // alert("Your data: " + JSON.stringify(this.user));
+    },
+    // 왜 안돼..?
+    logout() {
+      console.log(sessionStorage.getItem("refresh-token"));
+      if (sessionStorage.getItem("refresh-token")) {
+        Kakao.Auth.logout(function() {});
+      }
+      sessionStorage.clear();
+      this.SET_USER_INFO(null);
+      this.SET_IS_LOGIN(false);
+      // dropKakaoUser();
+      this.$router.push({ name: "home" });
+    },
+    deleteProfile(id) {
+      console.log(id);
+      var result = confirm("정말 탈퇴하시겠습니까?");
+      if (result) {
+        deleteUserById(id, ({ data }) => {
+          if (data.message == "success") {
+            alert("회원이 삭제되었습니다.");
+          } else {
+            alert("오류가 발생했습니다.");
+          }
+        });
+        logout();
+      }
     }
   },
   created() {

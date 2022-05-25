@@ -45,6 +45,14 @@ async function updateMyInfo(userInfo, success, fail) {
     .catch(fail);
 }
 
+
+async function deleteUserById(userid, success, fail) {
+  await api
+    .delete(`/user/deleteInfo/${userid}`)
+    .then(success)
+    .catch(fail);
+}
+
 // function logout(success, fail)
 
-export { login, findById, signUp, getMyInfo, updateMyInfo, findByKakaoId };
+export { login, findById, signUp, getMyInfo, updateMyInfo, findByKakaoId, deleteUserById };
