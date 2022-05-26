@@ -61,7 +61,7 @@
     <b-container fluid class="mt--7">
       <b-row>
         <b-col>
-          <light-notice-table />
+          <light-management-table />
         </b-col>
       </b-row>
       <div class="mt-5"></div>
@@ -79,12 +79,12 @@ import {
 } from "element-ui";
 import projects from "./Tables/projects";
 import users from "./Tables/users";
-import LightNoticeTable from "./Tables/RegularTables/LightNoticeTable";
+import LightManagementTable from "./Tables/RegularTables/LightManagementTable";
 import DarkTable from "./Tables/RegularTables/DarkTable";
 
 export default {
   components: {
-    LightNoticeTable,
+    LightManagementTable,
     DarkTable,
     [Dropdown.name]: Dropdown,
     [DropdownItem.name]: DropdownItem,
