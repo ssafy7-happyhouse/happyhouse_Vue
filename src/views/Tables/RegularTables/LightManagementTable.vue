@@ -3,7 +3,7 @@
     <b-card-header class="border-0">
       <b-row align-v="center">
         <b-col cols="8">
-          <h3 class="mb-0">공지사항</h3>
+          <h3 class="mb-0">회원 관리</h3>
         </b-col>
         <b-col cols="4" class="text-right">
           <!-- <a href="#!" class="btn btn-sm btn-primary">글쓰기</a> -->
@@ -81,6 +81,7 @@
             href="#!"
             class="btn btn-sm btn-primary"
             @click="deleteUser(row.id)"
+            v-if="!adminCheck(row.id)"
             >삭제</a
           >
         </template>
@@ -118,8 +119,14 @@
 <script>
 import projects from "../projects";
 import { Table, TableColumn } from "element-ui";
-import { getUserListByPaging } from "@/api/management";
+import {
+  getUserListByPaging,
+  getCountArticleById,
+  deleteAllBoardById
+} from "@/api/management";
 import { deleteUserById } from "@/api/user";
+import { mapState } from "vuex";
+
 import moment from "moment";
 
 export default {
@@ -145,10 +152,51 @@ export default {
       ]
     };
   },
+
+  computed: {
+    ...mapState("userStore", ["userInfo"])
+  },
   methods: {
     viewUser() {},
-    deleteUser(id) {
-      console.log(id);
+    adminCheck(id) {
+      if (id == null) {
+        return false;
+      }
+      if (id == "admin") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    async deleteUser(id) {
+      // console.log(id);
+      // 해당 유저가 쓴 글이 있는지,
+      await getCountArticleById(id, ({ data }) => {
+        if (data.message == "success") {
+          deleteAllBoardById(id, ({ data }) => {
+            if (data.message == "success") {
+              alert("사용자가 작성한 글을 모두 삭제하였습니다.");
+              this.delete(id);
+            } else {
+              this.delete(id);
+            }
+          });
+        } else {
+          this.delete(id);
+        }
+      });
+
+      // deleteUserById(id, ({ data }) => {
+      //   if (data.message == "success") {
+      //     alert("회원이 삭제되었습니다.");
+      //   } else {
+      //     alert("오류가 발생했습니다.");
+      //   }
+
+      //   this.$router.go();
+      // });
+    },
+    delete(id) {
       deleteUserById(id, ({ data }) => {
         if (data.message == "success") {
           alert("회원이 삭제되었습니다.");
@@ -162,22 +210,25 @@ export default {
     pageClick(event) {
       let pageNum = event;
       let pageSize = 10;
-      (this.users = []),
-        getUserListByPaging({ pageNum, pageSize }, response => {
-          // response.data.list.forEach(board => {
-          //   board.registDate = moment(board.registDate)
-          //     .add(-9, "h")
-          //     .format("yyyy.MM.DD LT");
-          //   board.comment_content =
-          //     board.comment_content == null ? "답변대기" : "답변완료";
-          //   if (board.comment_content === "답변완료") {
-          //     board.statusType = "success";
-          //   } else {
-          //     board.statusType = "warning";
-          //   }
-          //   this.boards.push(board);
-          // });
+      this.users = [];
+      getUserListByPaging({ pageNum, pageSize }, response => {
+        // response.data.list.forEach(board => {
+        //   board.registDate = moment(board.registDate)
+        //     .add(-9, "h")
+        //     .format("yyyy.MM.DD LT");
+        //   board.comment_content =
+        //     board.comment_content == null ? "답변대기" : "답변완료";
+        //   if (board.comment_content === "답변완료") {
+        //     board.statusType = "success";
+        //   } else {
+        //     board.statusType = "warning";
+        //   }
+        //   this.boards.push(board);
+        // });
+        response.data.list.forEach(user => {
+          this.users.push(user);
         });
+      });
     }
   },
   created() {
