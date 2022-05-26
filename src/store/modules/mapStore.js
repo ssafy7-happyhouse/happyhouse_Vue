@@ -408,6 +408,7 @@ const mapStore = {
       { commit, dispatch },
       { minAmount, maxAmount, minArea, maxArea, minBuildYear, maxBuildYear }
     ) {
+      commit("SET_LEVEL", 5);
       const container = document.querySelector("#map-custom");
       const options = {
         center: new kakao.maps.LatLng(37.541, 126.986),
