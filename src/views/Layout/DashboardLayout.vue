@@ -237,9 +237,9 @@ export default {
       let level = this.level;
       let map = this.map;
       let check = true;
-      this.changeZoom({ level, map, check });
-
       this.setFilterValue(val);
+
+      this.changeZoom({ level, map, check });
     }
   },
   methods: {

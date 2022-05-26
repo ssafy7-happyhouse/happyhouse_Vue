@@ -438,10 +438,9 @@ const mapStore = {
         commit("REMOVE_CUSTOMOVERLAY");
       }
 
-      if (level == 3) {
+      if ((level == 3 && getters.level != 3) || (getters.level == 3 && check)) {
         commit("REMOVE_OVERLAYS");
         commit("REMOVE_MARKERS");
-
         aptList(
           {
             minArea: Math.round(value[0][0] * 3.305),
@@ -465,31 +464,11 @@ const mapStore = {
             dispatch("makeMarkerFunction", { positions, map });
           }
         );
-      } else if (level == 4 || level == 6 || check) {
-        commit("REMOVE_OVERLAYS");
-        commit("REMOVE_MARKERS");
-        aptListByDong(
-          {
-            minArea: Math.round(value[0][0] * 3.305),
-            maxArea: Math.round(value[0][1] * 3.305),
-            minAmount: value[1][0] * 10000,
-            maxAmount: value[1][1] * 10000,
-            minBuildYear: value[2][0] + 2000,
-            maxBuildYear: value[2][1] + 2000
-          },
-          response => {
-            let positions = [];
-            response.data.forEach(element => {
-              positions.push({
-                latlng: new kakao.maps.LatLng(element.lat, element.lng),
-                amount: element.avgAmount,
-                area: element.dongName
-              });
-            });
-            dispatch("makeMarkerFunction", { positions, map });
-          }
-        );
-      } else if (level == 7) {
+        commit("SET_LEVEL", 3);
+      } else if (
+        (level == 7 && getters.level != 7) ||
+        (getters.level == 7 && check)
+      ) {
         commit("REMOVE_OVERLAYS");
         commit("REMOVE_MARKERS");
 
@@ -515,8 +494,37 @@ const mapStore = {
           },
           error => {}
         );
+        commit("SET_LEVEL", 7);
+      } else if (
+        (level == 4 && getters.level != 6) ||
+        (level == 6 && getters.level != 6) ||
+        (getters.level == 6 && check)
+      ) {
+        commit("REMOVE_OVERLAYS");
+        commit("REMOVE_MARKERS");
+        aptListByDong(
+          {
+            minArea: Math.round(value[0][0] * 3.305),
+            maxArea: Math.round(value[0][1] * 3.305),
+            minAmount: value[1][0] * 10000,
+            maxAmount: value[1][1] * 10000,
+            minBuildYear: value[2][0] + 2000,
+            maxBuildYear: value[2][1] + 2000
+          },
+          response => {
+            let positions = [];
+            response.data.forEach(element => {
+              positions.push({
+                latlng: new kakao.maps.LatLng(element.lat, element.lng),
+                amount: element.avgAmount,
+                area: element.dongName
+              });
+            });
+            dispatch("makeMarkerFunction", { positions, map });
+          }
+        );
+        commit("SET_LEVEL", 6);
       }
-      commit("SET_LEVEL", level);
     },
     setFilterValue({ commit }, val) {
       commit("SET_FILTERVALUE", val);
