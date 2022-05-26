@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Header -->
-    <div class="header bg-gradient-success py-7 py-lg-8 pt-lg-9">
+    <div class="header bg-gradient-primary py-7 py-lg-8 pt-lg-9">
       <b-container class="container">
         <div class="header-body text-center mb-7">
           <b-row class="justify-content-center">
@@ -44,7 +44,9 @@
                   <span class="btn-inner--icon"
                     ><img src="img/icons/common/kakaologo.jpg"
                   /></span>
-                  <span class="btn-inner--text" @click="kakaoSignUp">카카오톡으로 회원가입</span>
+                  <span class="btn-inner--text" @click="kakaoSignUp"
+                    >카카오톡으로 회원가입</span
+                  >
                 </a>
                 <!-- <a href="#" class="btn btn-neutral btn-icon">
                   <span class="btn-inner--icon"
@@ -185,9 +187,9 @@ export default {
         password: ""
         // agree: false
       },
-      token:{
+      token: {
         access_token: "",
-        refresh_token: "",
+        refresh_token: ""
       }
     };
   },
@@ -214,7 +216,7 @@ export default {
       // });
       // this will be called only after form is valid. You can do an api call here to register users
     },
-    kakaoSignUp(){ 
+    kakaoSignUp() {
       const param = {
         redirectUri: "http://localhost:8080/register"
       };
@@ -222,7 +224,10 @@ export default {
     },
     async setKakaoToken() {
       console.log("카카오 인증 코드", this.$route.query.code);
-      const { data } = await getKakaoToken(this.$route.query.code, "http://localhost:8080/register");
+      const { data } = await getKakaoToken(
+        this.$route.query.code,
+        "http://localhost:8080/register"
+      );
       if (data.error) {
         alert("카카오톡 로그인 오류입니다.");
         this.$router.go();
@@ -251,45 +256,44 @@ export default {
         platform: "kakao"
       };
       // this.$store.commit("SET_USER_INFO", userInfo);
-      await findByKakaoId(userInfo.id,({data})=>{
+      await findByKakaoId(userInfo.id, ({ data }) => {
         console.log("여기를 확인해라");
         console.log(data);
-        if(data.userId != null){
-            alert("이미 가입되어있는 회원입니다. 로그인을 진행해주세요.");
-            this.$router.push({ name: "login" });
-
-        }else{
+        if (data.userId != null) {
+          alert("이미 가입되어있는 회원입니다. 로그인을 진행해주세요.");
+          this.$router.push({ name: "login" });
+        } else {
           signUp(
-        {
-        id: userInfo.id,
-        name: userInfo.name,
-        address: "kakao",
-        phone: "",
-        favorite: "",
-        password: userInfo.id+admin_str,
-        // agree: false
-      },
-        response => {
-          if (response.data.message === "success") {
-            sessionStorage.setItem("access-token", data.access_token);
-      sessionStorage.setItem("refresh-token", data.refresh_token);
+            {
+              id: userInfo.id,
+              name: userInfo.name,
+              address: "kakao",
+              phone: "",
+              favorite: "",
+              password: userInfo.id + admin_str
+              // agree: false
+            },
+            response => {
+              if (response.data.message === "success") {
+                sessionStorage.setItem("access-token", data.access_token);
+                sessionStorage.setItem("refresh-token", data.refresh_token);
                 this.SET_USER_INFO(userInfo);
 
-            alert("회원가입과 로그인이 완료되었습니다.");
+                alert("회원가입과 로그인이 완료되었습니다.");
 
-            this.$router.push({ name: "login" });
-          } else if (response.data.message === "similarlity") {
-            alert("아이디와 비밀번호의 유사도가 높습니다.");
-          } else {
-            alert("회원가입이 실패했습니다.");
-          }
-        },
-        fail => {
-          console.log(fail);
+                this.$router.push({ name: "login" });
+              } else if (response.data.message === "similarlity") {
+                alert("아이디와 비밀번호의 유사도가 높습니다.");
+              } else {
+                alert("회원가입이 실패했습니다.");
+              }
+            },
+            fail => {
+              console.log(fail);
+            }
+          );
         }
-      );
-        }
-      })
+      });
       console.log(userInfo);
     }
   },

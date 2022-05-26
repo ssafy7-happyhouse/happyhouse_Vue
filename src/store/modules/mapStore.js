@@ -9,10 +9,13 @@ import {
   aptListByGugun
 } from "../../api/apartment";
 import imageSrc from "@/assets/marker.png";
+import clustererSrc from "@/assets/clusterer.png";
 
 const mapStore = {
   namespaced: true,
   state: {
+    customOverlay: null,
+    markerLatLng: [0, 0],
     title: null,
     aptAddress: null,
     clusterer: null,
@@ -40,6 +43,12 @@ const mapStore = {
   },
 
   getters: {
+    customOverlay(state) {
+      return state.customOverlay;
+    },
+    markerLatLng(state) {
+      return state.markerLatLng;
+    },
     level(state) {
       return state.level;
     },
@@ -82,6 +91,16 @@ const mapStore = {
   },
 
   mutations: {
+    SET_CUSTOMOVERLAY: (state, customOverlay) => {
+      state.customOverlay = customOverlay;
+    },
+    REMOVE_CUSTOMOVERLAY: state => {
+      state.customOverlay.setMap(null);
+      state.customOverlay = null;
+    },
+    SET_MARKERLATLNG: (state, markerLatLng) => {
+      state.markerLatLng = markerLatLng;
+    },
     SET_LEVEL: (state, level) => {
       state.level = level;
     },
@@ -170,11 +189,14 @@ const mapStore = {
       state.chartData.datasets[0].data.length = 0;
     },
     SET_MAPLEVEL: state => {
-      // state.map.setLevel(2);
+      state.map.setLevel(5);
     }
   },
 
   actions: {
+    setCustomOverlay({ commit, getters }, { customOverlay }) {
+      commit("SET_CUSTOMOVERLAY", customOverlay);
+    },
     category({ commit, getters }) {
       // 마커를 클릭했을 때 해당 장소의 상세정보를 보여줄 커스텀오버레이입니다
       let placeOverlay = new kakao.maps.CustomOverlay({ zIndex: 1 });
@@ -409,11 +431,16 @@ const mapStore = {
       });
       commit("SET_MAP", map);
     },
-    changeZoom({ commit, dispatch, getters }, { level, map }) {
+    changeZoom({ commit, dispatch, getters }, { level, map, check }) {
       let value = getters.filterValue;
+      if (getters.customOverlay != null) {
+        commit("REMOVE_CUSTOMOVERLAY");
+      }
+
       if (level == 3) {
         commit("REMOVE_OVERLAYS");
         commit("REMOVE_MARKERS");
+
         aptList(
           {
             minArea: Math.round(value[0][0] * 3.305),
@@ -437,7 +464,7 @@ const mapStore = {
             dispatch("makeMarkerFunction", { positions, map });
           }
         );
-      } else if (level > 3 && level <= 6) {
+      } else if (level == 4 || level == 6 || check) {
         commit("REMOVE_OVERLAYS");
         commit("REMOVE_MARKERS");
         aptListByDong(
@@ -538,13 +565,24 @@ const mapStore = {
 
         // 마커 이미지를 생성합니다
         let markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+        let clusterImage = new kakao.maps.MarkerImage(clustererSrc, imageSize);
         // 마커를 생성합니다
-        let marker = new kakao.maps.Marker({
-          map: map, // 마커를 표시할 지도
-          position: positions[i].latlng, // 마커를 표시할 위치
-          title: positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
-          image: markerImage // 마커 이미지
-        });
+        let marker;
+        if (level <= 3) {
+          marker = new kakao.maps.Marker({
+            map: map, // 마커를 표시할 지도
+            position: positions[i].latlng, // 마커를 표시할 위치
+            title: positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+            image: markerImage // 마커 이미지
+          });
+        } else {
+          marker = new kakao.maps.Marker({
+            map: map, // 마커를 표시할 지도
+            position: positions[i].latlng, // 마커를 표시할 위치
+            title: positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+            image: clusterImage // 마커 이미지
+          });
+        }
         commit("SET_MARKERS", marker);
 
         let aptCode = positions[i].aptCode;
@@ -566,7 +604,7 @@ const mapStore = {
 
         let markerClickGugun = function() {
           map.panTo(latlng);
-          map.setLevel(5);
+          map.setLevel(4);
         };
 
         let content = document.createElement("div");
@@ -707,6 +745,10 @@ const mapStore = {
           );
           commit("SET_APTDETAIL", response.data.list);
           document.getElementById("customSidebar").style.width = "500px";
+          commit("SET_MARKERLATLNG", [
+            response.data.list[0].lat,
+            response.data.list[0].lng
+          ]);
         },
         error => {}
       );
@@ -740,9 +782,10 @@ const mapStore = {
       );
     },
     getAptListByDongCodeAndAptName(
-      { commit },
+      { commit, getters },
       { dongCode, aptName, pageNum, pageSize }
     ) {
+      let map = getters.map;
       aptDetailListByAptCodeAndAptName(
         {
           dongCode: dongCode,
@@ -768,6 +811,16 @@ const mapStore = {
               response.data.list[0].jibun
           );
           commit("SET_APTDETAIL", response.data.list);
+          map.panTo(
+            new kakao.maps.LatLng(
+              response.data.list[0].lat,
+              response.data.list[0].lng
+            )
+          );
+          commit("SET_MARKERLATLNG", [
+            response.data.list[0].lat,
+            response.data.list[0].lng
+          ]);
         },
         error => {}
       );
